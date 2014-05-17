@@ -26,7 +26,8 @@ $app = new Illuminate\Foundation\Application;
 
 $env = $app->detectEnvironment(array(
 
-	'local' => array('your-machine-name'),
+	'local' => array('Taskle'),
+	'production' => array('sbvbc-prod-xhteuuhtdq.elasticbeanstalk.com'),
 
 ));
 
