@@ -33,6 +33,9 @@
 @section('title')
 @stop
 
+@section('header')
+@stop
+
 @section('content')
     <img src="/images/logos/logo-large.png" />
 	<h1>Coming soon...</h1>

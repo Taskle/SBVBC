@@ -21,14 +21,16 @@
 	@yield('css')
 </head>
 <body>
-	<header>
-	    <img src="/images/logos/logo-small.png" />
-		<h1>
-			@section('title')
-			South Bay Volleyball Club
-			@show
-		</h1>
-	</header>
+	@section('header')
+		<header>
+			<img src="/images/logos/logo-small.png" />
+			<h1>
+				@section('title')
+				South Bay Volleyball Club
+				@show
+			</h1>
+		</header>
+	@show
 	<div class="main">
 		@yield('content')
 	</div>
