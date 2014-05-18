@@ -13,7 +13,12 @@
 
 Route::get('/', function()
 {
-	return View::make('hello');
+	return View::make('coming-soon');
+});
+
+Route::get('/index', function()
+{
+	return View::make('index');
 });
 
 Route::get('users', function()
