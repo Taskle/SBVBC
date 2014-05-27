@@ -57,7 +57,7 @@ return array(
 			'host'      => 'localhost',
 			'database'  => 'sbvbc',
 			'username'  => 'root',
-			'password'  => '',
+			'password'  => $_SERVER['DB_PASSWORD'],
 			'charset'   => 'utf8',
 			'collation' => 'utf8_unicode_ci',
 			'prefix'    => '',

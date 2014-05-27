@@ -26,7 +26,8 @@ $app = new Illuminate\Foundation\Application;
 
 $env = $app->detectEnvironment(array(
 
-	'local' => array('Taskle'),
+	'local' => array('Taskle', 'David’s MacBook Pro',
+            'Davids-MacBook-Pro.local'),
 	'production' => array('sbvbc-prod-xhteuuhtdq.elasticbeanstalk.com'),
 
 ));
