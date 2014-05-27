@@ -46,11 +46,11 @@ return array(
 
 	'connections' => array(
 
-		'sqlite' => array(
-			'driver'   => 'sqlite',
-			'database' => __DIR__.'/../database/production.sqlite',
-			'prefix'   => '',
-		),
+//		'sqlite' => array(
+//			'driver'   => 'sqlite',
+//			'database' => __DIR__.'/../database/production.sqlite',
+//			'prefix'   => '',
+//		),
 
 		'mysql' => array(
 			'driver'    => 'mysql',
@@ -64,25 +64,25 @@ return array(
 			'prefix'    => '',
 		),
 
-		'pgsql' => array(
-			'driver'   => 'pgsql',
-			'host'     => 'localhost',
-			'database' => 'database',
-			'username' => 'root',
-			'password' => '',
-			'charset'  => 'utf8',
-			'prefix'   => '',
-			'schema'   => 'public',
-		),
-
-		'sqlsrv' => array(
-			'driver'   => 'sqlsrv',
-			'host'     => 'localhost',
-			'database' => 'database',
-			'username' => 'root',
-			'password' => '',
-			'prefix'   => '',
-		),
+//		'pgsql' => array(
+//			'driver'   => 'pgsql',
+//			'host'     => 'localhost',
+//			'database' => 'database',
+//			'username' => 'root',
+//			'password' => '',
+//			'charset'  => 'utf8',
+//			'prefix'   => '',
+//			'schema'   => 'public',
+//		),
+//
+//		'sqlsrv' => array(
+//			'driver'   => 'sqlsrv',
+//			'host'     => 'localhost',
+//			'database' => 'database',
+//			'username' => 'root',
+//			'password' => '',
+//			'prefix'   => '',
+//		),
 
 	),
 
@@ -110,16 +110,16 @@ return array(
 	|
 	*/
 
-	'redis' => array(
-
-		'cluster' => false,
-
-		'default' => array(
-			'host'     => '127.0.0.1',
-			'port'     => 6379,
-			'database' => 0,
-		),
-
-	),
+//	'redis' => array(
+//
+//		'cluster' => false,
+//
+//		'default' => array(
+//			'host'     => '127.0.0.1',
+//			'port'     => 6379,
+//			'database' => 0,
+//		),
+//
+//	),
 
 );
