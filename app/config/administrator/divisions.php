@@ -55,6 +55,11 @@ return array(
 			'title' => 'Name',
 			'type' => 'text',
 		),
+		'tournaments' => array(
+			'title' => 'Tournaments',
+			'type' => 'relationship',
+			'name_field' => 'name',
+		),
 		'ratings_allowed' => array(
 			'title' => 'Ratings allowed (comma-separated)',
 			'type' => 'text',
@@ -101,12 +106,6 @@ return array(
 		),		
 		'description' => array(
 			'title' => 'General description',
-			'type' => 'markdown',
-			'limit' => 512,
-			'height' => 350
-		),
-		'cost_description' => array(
-			'title' => 'Description about pricing/cost',
 			'type' => 'markdown',
 			'limit' => 512,
 			'height' => 350

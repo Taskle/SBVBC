@@ -16,7 +16,6 @@ class CreateDivisionsTable extends Migration {
 			$table->increments('id');
 			$table->string('name');
 			$table->string('description', 512);
-			$table->string('cost_description', 512);
 			$table->string('ratings_allowed')->nullable(); // comma-separated list
 			$table->tinyInteger('team_size')->default(6);
 			$table->tinyInteger('min_teams')->default(0);

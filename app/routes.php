@@ -13,7 +13,8 @@
 
 Route::get('/', function() {
 	
-	if (Auth::check()) {
+	if (Auth::check() && Auth::user()->role != 'Admin') {
+		
 		return View::make('home');
 	}
 	else {
