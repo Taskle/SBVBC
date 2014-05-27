@@ -3,8 +3,8 @@
 class Division extends Eloquent {
 
 	protected $table = 'divisions';
-    protected $fillable = array('name');
-
+    protected $guarded = array('id');
+	
 	/**
 	 * Get the unique identifier for the user.
 	 *

@@ -19,8 +19,18 @@ return array(
 			'sort_field' => 'name',
 		),
 		'num_members' => array(
+			'title' => '# participants',
+			'relationship' => 'users',
+			'select' => 'COUNT((:table).id)',
+		),
+		'num_teams' => array(
 			'title' => '# teams',
 			'relationship' => 'teams',
+			'select' => 'COUNT((:table).id)',
+		),
+		'num_members' => array(
+			'title' => '# divisions',
+			'relationship' => 'divisions',
 			'select' => 'COUNT((:table).id)',
 		),
 	),
@@ -33,6 +43,9 @@ return array(
 		'name' => array(
 			'title' => 'Name',
 		),
+		'date' => array(
+			'title' => 'Date/Time',
+		),
 	),
 
 	/**
@@ -42,6 +55,16 @@ return array(
 		'name' => array(
 			'title' => 'Name',
 			'type' => 'text',
+		),
+		'date' => array(
+			'title' => 'Date/Time',
+			'type' => 'datetime',
+		),
+		'description' => array(
+			'title' => 'Description',
+			'type' => 'markdown',
+			'limit' => 4096,
+			'height' => 350
 		),
 	),
 

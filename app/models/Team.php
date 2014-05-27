@@ -3,7 +3,7 @@
 class Team extends Eloquent {
 
 	protected $table = 'teams';
-    protected $fillable = array('name');
+    protected $guarded = array('id');
 
 	/**
 	 * Get the unique identifier for the user.

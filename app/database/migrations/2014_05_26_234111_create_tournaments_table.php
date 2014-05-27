@@ -15,6 +15,7 @@ class CreateTournamentsTable extends Migration {
 			$table->timestamps();
 			$table->increments('id');
 			$table->string('name');
+			$table->string('description', 4096);
 			$table->dateTime('date')->nullable();
 		});
 	}

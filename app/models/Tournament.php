@@ -3,7 +3,7 @@
 class Tournament extends Eloquent {
 
 	protected $table = 'tournaments';
-    protected $fillable = array('name');
+    protected $guarded = array('id');
 
 	/**
 	 * Get the unique identifier for the user.
