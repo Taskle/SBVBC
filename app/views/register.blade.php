@@ -14,11 +14,16 @@
 
 {{ Form::open(array('url' => 'register', 'class' => 'form-register')) }}
 <h2 class="form-register-heading">Register</h2>
-{{ Form::text('name', $user->name, array(
+{{ Form::text('first_name', $user->name, array(
 				'class' => 'form-control',
-				'placeholder' => 'Full name',
+				'placeholder' => 'First name',
 				'required' => true,
 				'autofocus' => true,
+	)) }}
+{{ Form::text('last_name', $user->name, array(
+				'class' => 'form-control',
+				'placeholder' => 'Last name',
+				'required' => true,
 	)) }}
 {{ Form::text('email', $user->email, array(
 				'class' => 'form-control',

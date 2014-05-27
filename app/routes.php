@@ -17,7 +17,10 @@ Route::get('/', function() {
 		return View::make('home');
 	}
 	else {
-		return View::make('index');
+		
+		// get most recent tournament in database
+		$tournament = Tournament::find(1);
+		return View::make('index')->with('tournament', $tournament);
 	}
 });
 
@@ -88,7 +91,7 @@ Route::post('register', function() {
 			'password' => Hash::make(Input::get('password')),
 		));
 
-		return 'Thanks for registering!';
+		return Redirect::to('/');
 		
 	} else {
 		return Redirect::to('/register')->withErrors($v->messages());

@@ -17,8 +17,10 @@ class CreateUsersTable extends Migration {
 			$table->string('email')->unique();
 			$table->string('password');
 			$table->string('remember_token', 100)->nullable();
-			$table->string('name');
-			$table->string('rating')->nullable();
+			$table->string('first_name');
+			$table->string('last_name');
+			$table->enum('rating',
+				array('Unrated', 'AA', 'A', 'BB', 'B'))->default('Unrated');
 			$table->string('stripe_id')->nullable();
 		});
 	}

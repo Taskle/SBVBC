@@ -2,12 +2,8 @@
 
 class Division extends Eloquent {
 
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */
 	protected $table = 'divisions';
+    protected $fillable = array('name');
 
 	/**
 	 * Get the unique identifier for the user.

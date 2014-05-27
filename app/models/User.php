@@ -7,9 +7,11 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 
 	protected $table = 'users';
 	protected $hidden = array('password');
-    protected $fillable = array('name', 'email', 'password', 'remember_token');
+    protected $fillable = array('first_name', 'last_name', 
+		'email', 'password', 'remember_token');
     public static $rules = array(
-		'name' => 'Required|Min:3',
+		'first_name' => 'Required|Min:3',
+		'last_name' => 'Required|Min:3',
 		'email' => 'Required|Between:3,64|Email|Unique:users',
 		'password' => 'Required|AlphaNum|Between:4,32',
 	);
@@ -71,6 +73,15 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	 */
 	public function getReminderEmail() {
 		return $this->email;
+	}
+	
+	/**
+	 * Get the full name of the user
+	 *
+	 * @return mixed
+	 */
+	public function getFullName() {
+		return $this->first_name . ' ' . $this->last_name;
 	}
 	
     public function division()

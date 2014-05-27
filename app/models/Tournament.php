@@ -2,12 +2,8 @@
 
 class Tournament extends Eloquent {
 
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */
 	protected $table = 'tournaments';
+    protected $fillable = array('name');
 
 	/**
 	 * Get the unique identifier for the user.

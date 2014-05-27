@@ -2,12 +2,8 @@
 
 class Team extends Eloquent {
 
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */
 	protected $table = 'teams';
+    protected $fillable = array('name');
 
 	/**
 	 * Get the unique identifier for the user.

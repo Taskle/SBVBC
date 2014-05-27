@@ -15,7 +15,7 @@ class CreateTournamentsTable extends Migration {
 			$table->timestamps();
 			$table->increments('id');
 			$table->string('name');
-			$table->dateTime('date');
+			$table->dateTime('date')->nullable();
 		});
 	}
 

@@ -41,6 +41,8 @@
 			</div>
 		</div>
 	@show
+	@section('jumbotron')
+	@show
 	<div class="main container">
 		<h1>
 		@section('title')

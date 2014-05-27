@@ -15,7 +15,7 @@ Registration Details
 		<h3 class="panel-title">Basic Info</h3>
 	</div>
 	<div class="panel-body">
-		<h4>{{ Auth::user()->name }}</h4>
+		<h4>{{ Auth::user()->getFullName() }}</h4>
 		@if (Auth::user()->rating)
 			Rating: {{ Auth::user()->rating  }}
 		@else
