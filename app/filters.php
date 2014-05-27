@@ -12,10 +12,7 @@
  */
 
 App::before(function($request) {
-	/* always require https */
-	if (!Request::secure()) {
-		return Redirect::secure(Request::path());
-	}
+	//
 });
 
 
