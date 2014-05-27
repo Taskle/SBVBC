@@ -12,7 +12,7 @@
 
 @section('content')
 
-{{ Form::open(array('url' => URL::secure('register'), 'class' => 'form-register')) }}
+{{ Form::open(array('url' => 'register', 'class' => 'form-register')) }}
 
 @if ($type == 'team')
 	<h2 class="form-register-heading">Register Team</h2>

@@ -12,7 +12,7 @@
 
 @section('content')
 
-{{ Form::open(array('url' => URL::secure('login'), 'class' => 'form-signin')) }}
+{{ Form::open(array('url' => 'login', 'class' => 'form-signin')) }}
 <h2 class="form-signin-heading">Login</h2>
 {{ Form::text('email', '', array(
 				'class' => 'form-control',
