@@ -34,6 +34,9 @@
 							<li><a href="/login">Log in</a></li>
 						@else
 							<li><a href="/">{{ Auth::user()->name }}</a></li>
+							@if (Auth::user()->role == 'Admin')
+								<li><a href="/admin">Admin</a></li>
+							@endif
 							<li><a href="/logout">Log out</a></li>
 						@endif
 					</ul>

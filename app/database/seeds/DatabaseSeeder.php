@@ -31,12 +31,60 @@ class UserTableSeeder extends Seeder {
 	public function run()
 	{
         DB::table('users')->delete();
-        User::create(array(
+		
+        $user = User::create(array(
 			'first_name' => 'David',
 			'last_name' => 'Murray',
 			'email' => 'david@sbvbc.org',
-			'password' => Hash::make('testtest')
+			'password' => Hash::make('testtest'),
 		));
+		$user->role = 'Admin';
+		$user->save();
+		
+        $user2 = User::create(array(
+			'first_name' => 'John',
+			'last_name' => 'Lam',
+			'email' => 'john@sbvbc.org',
+			'password' => Hash::make('testtest'),
+		));
+		$user2->role = 'Admin';
+		$user2->save();
+		
+        $user3 = User::create(array(
+			'first_name' => 'Jim',
+			'last_name' => 'Moore',
+			'email' => 'jim@sbvbc.org',
+			'password' => Hash::make('testtest'),
+		));
+		$user3->role = 'Admin';
+		$user3->save();
+		
+        $user4 = User::create(array(
+			'first_name' => 'Mark',
+			'last_name' => 'Ware',
+			'email' => 'mark@sbvbc.org',
+			'password' => Hash::make('testtest'),
+		));
+		$user4->role = 'Admin';
+		$user4->save();
+		
+        $user5 = User::create(array(
+			'first_name' => 'Roland',
+			'last_name' => 'Tabaday',
+			'email' => 'roland@sbvbc.org',
+			'password' => Hash::make('testtest'),
+		));
+		$user5->role = 'Admin';
+		$user5->save();
+		
+        $user6 = User::create(array(
+			'first_name' => 'Kevin',
+			'last_name' => 'Yamashiro',
+			'email' => 'kevin@sbvbc.org',
+			'password' => Hash::make('testtest'),
+		));
+		$user6->role = 'Admin';
+		$user6->save();
 	}
 
 }

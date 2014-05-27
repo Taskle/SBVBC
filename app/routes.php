@@ -27,7 +27,7 @@ Route::get('/', function() {
 Route::get('login', function() {
 	
 	if (Auth::check()) {
-		return Redirect::intended('/');
+		return Redirect::to('/');
 	}
 	
 	$user = new User;

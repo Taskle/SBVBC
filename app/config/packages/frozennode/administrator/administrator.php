@@ -61,7 +61,7 @@ return array(
 	 */
 	'permission'=> function()
 	{
-		return Auth::check();
+		return (Auth::check() && Auth::user()->role == 'Admin');
 	},
 
 	/**

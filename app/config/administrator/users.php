@@ -91,6 +91,11 @@ return array(
 			'type' => 'relationship',
 			'name_field' => 'name',
 		),
+		'role' => array(
+			'title' => 'Website Role',
+			'type' => 'enum',
+			'options' => array('Normal', 'Admin'),
+		),
 	),
 
 );
