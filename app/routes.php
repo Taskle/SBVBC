@@ -15,7 +15,14 @@ Route::get('/', function() {
 
 	if (Auth::check() && Auth::user()->role != 'Admin') {
 
-		return View::make('home');
+		$tournament = Auth::user()->tournaments()->get();
+		$divisions = Auth::user()->divisions()->get();
+		$teams = Auth::user()->teams()->get();
+		
+		return View::make('home')
+				->with('tournaments', $tournament)
+				->with('divisions', $divisions)
+				->with('teams', $teams);
 	} else {
 
 		// get most recent tournament in database
@@ -166,8 +173,14 @@ Route::post('register', function() {
 				->withInput()->with('stripe_errors', $error['message']);
 		}
 
-		// save user's stripe info
+		// create and log in user
 		$user = User::create($userParams);
+		Auth::attempt([
+			'email' => $email,
+			'password' => $password
+		]);
+		
+		// save user's stripe info
 		$user->stripe_id = $charge->id;
 		$user->save();
 		
@@ -179,7 +192,7 @@ Route::post('register', function() {
 		if ($type == 'team') {
 			
 			$team = Team::create([
-				name => $user->getFullName() . "'s team"
+				'name' => $user->getFullName() . "'s team"
 			]);
 			
 			$team->tournaments()->save($tournament);
