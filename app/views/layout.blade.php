@@ -30,7 +30,6 @@
 				<div class="navbar-collapse collapse">
 					<ul class="nav navbar-nav">
 						@if (Auth::guest())
-							<li><a href="/register">Register</a></li>
 							<li><a href="/login">Log in</a></li>
 						@else
 							<li><a href="/">{{ Auth::user()->name }}</a></li>
