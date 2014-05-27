@@ -43,6 +43,8 @@ Route::get('login', function() {
 
 Route::post('login', function() {
 
+	die(Input::all());
+	
 	$rules = array(
 		'email' => 'Required',
 		'password' => 'Required',
