@@ -18,6 +18,13 @@ header, h1, h2, h3, h4, h5, h6 {
 	position: relative;
 	top: -26px;
 	font-weight: bold;
+	display: none;
+}
+
+@media (min-width: 768px) {
+	.navbar-brand .logo-name {
+		display: inline;
+	}
 }
 
 .form-control {
