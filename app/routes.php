@@ -15,23 +15,21 @@ Route::get('/', function() {
 	return View::make('index');
 });
 
-Route::get('/coming-soon', function() {
-	return View::make('coming-soon');
-});
-
 Route::get('login', function() {
+	
+	if (Auth::check()) {
+		return Redirect::intended('/');
+	}
+	
 	$user = new User;
-	return View::make('login')->with('user', $user);
+	return View::make('login')->with('user', $user);	
 });
 
 Route::post('login', function() {
-	
-	$user = new User;
-	$user->fill($_POST);
 
 	$rules = array(
-		'email' => User::$rules['email'],
-		'password' => User::$rules['password'],
+		'email' => 'Required',
+		'password' => 'Required',
 	);
 
     $v = Validator::make(Input::all(), $rules);
@@ -55,7 +53,17 @@ Route::post('login', function() {
 	}
 });
 
+Route::get('logout', function() {
+	Auth::logout();
+	return Redirect::intended('/');
+});
+
 Route::get('register', function() {
+	
+	if (Auth::check()) {
+		return Redirect::intended('/');
+	}
+	
 	$user = new User;
 	return View::make('register')->with('user', $user);
 });

@@ -33,7 +33,7 @@
 							<li><a href="/register">Register</a></li>
 							<li><a href="/login">Log in</a></li>
 						@else
-							<li>{{ Auth::user()->name }}</li>
+							<li><a href="/">{{ Auth::user()->name }}</a></li>
 							<li><a href="/logout">Log out</a></li>
 						@endif
 					</ul>
