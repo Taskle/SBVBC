@@ -7,4 +7,3 @@ composer.phar
 Thumbs.db
 nbproject/private/
 .elasticbeanstalk/
-.env.local.php
