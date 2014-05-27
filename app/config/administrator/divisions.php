@@ -23,6 +23,10 @@ return array(
 			'relationship' => 'teams',
 			'select' => "COUNT((:table).id)",
 		),
+		'max_teams' => array(
+			'title' => 'Maximum number of teams',
+			'type' => 'number',
+		),
 		'allow_team_registration' => array(
 			'title' => 'Team reg?',
 			'sort_field' => 'allow_team_registration'
@@ -55,6 +59,10 @@ return array(
 			'title' => 'Ratings allowed (comma-separated)',
 			'type' => 'text',
 		),
+		'team_size' => array(
+			'title' => 'On-court team size',
+			'type' => 'number',
+		),
 		'min_teams' => array(
 			'title' => 'Minimum number of teams',
 			'type' => 'number',
@@ -71,6 +79,18 @@ return array(
 			'title' => 'Maximum team size',
 			'type' => 'number',
 		),
+		'solo_price' => array(
+			'title' => 'Price per individual (in CENTS)',
+			'type' => 'number',
+		),
+		'team_price' => array(
+			'title' => 'Price per team (in CENTS)',
+			'type' => 'number',
+		),
+		'additional_team_member_price' => array(
+			'title' => 'Team price for each additional person (in CENTS)',
+			'type' => 'number',
+		),
 		'allow_team_registration' => array(
 			'title' => 'Allow team registration?',
 			'type' => 'bool',
@@ -78,6 +98,18 @@ return array(
 		'allow_solo_registration' => array(
 			'title' => 'Allow solo registration?',
 			'type' => 'bool',
+		),		
+		'description' => array(
+			'title' => 'General description',
+			'type' => 'markdown',
+			'limit' => 512,
+			'height' => 350
+		),
+		'cost_description' => array(
+			'title' => 'Description about pricing/cost',
+			'type' => 'markdown',
+			'limit' => 512,
+			'height' => 350
 		),
 	),
 

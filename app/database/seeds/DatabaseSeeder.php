@@ -132,19 +132,33 @@ class DivisionTableSeeder extends Seeder {
         DB::table('divisions')->delete();
         Division::create(array(
 			'name' => 'B/BB (6v6)',
+			'team_size' => 6,
 			'ratings_allowed' => 'B,BB',
+			'description' => 'Individuals only (no pre-made teams)',
+			'cost_description' => '$30 per individual',
+			'solo_price' => 3000,
 			'allow_team_registration' => false,
 			'allow_solo_registration' => true
 		));
         Division::create(array(
 			'name' => 'BB/A (4v4)',
+			'team_size' => 4,
 			'ratings_allowed' => 'A,BB,B',
+			'description' => 'Pre-made teams only',
+			'cost_description' => '$200 for up to 6 people, $50 for each additional',
+			'team_price' => 20000,
+			'additional_team_member_price' => 5000,
 			'allow_team_registration' => true,
 			'allow_solo_registration' => false
 		));
         Division::create(array(
 			'name' => 'A/AA (2v2)',
+			'team_size' => 2,
 			'ratings_allowed' => 'A,AA,BB,B',
+			'description' => 'Pre-made teams only',
+			'cost_description' => '$100 for 2 people, $50 for each additional',
+			'team_price' => 10000,
+			'additional_team_member_price' => 5000,
 			'allow_team_registration' => true,
 			'allow_solo_registration' => false
 		));
