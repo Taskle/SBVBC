@@ -12,7 +12,13 @@
  */
 
 Route::get('/', function() {
-	return View::make('index');
+	
+	if (Auth::check()) {
+		return View::make('home');
+	}
+	else {
+		return View::make('index');
+	}
 });
 
 Route::get('login', function() {
