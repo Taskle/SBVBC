@@ -43,8 +43,6 @@ Route::get('login', function() {
 
 Route::post('login', function() {
 
-	die(Input::all());
-	
 	$rules = array(
 		'email' => 'Required',
 		'password' => 'Required',
@@ -58,10 +56,9 @@ Route::post('login', function() {
 		if (Auth::attempt(array(
 					'email' => Input::get('email'),
 					'password' => Input::get('password')))) {
-			return "Logged in successfully";
+
 			return Redirect::intended('/login');
 		} else {
-			return "Could not log in";
 			return Redirect::to('/login')->withErrors('Invalid email or password');
 		}
 	} else {

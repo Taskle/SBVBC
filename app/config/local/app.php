@@ -2,4 +2,5 @@
 
 return array(
 	'debug' => true,
+	'ssl' => true
 );

@@ -1,5 +1,6 @@
 <?php
 
 return array(
-	'debug' => true,
+	'debug' => false,
+	'ssl' => true
 );
