@@ -4,34 +4,53 @@
 	<meta charset="UTF-8">
 	<title>South Bay Volleyball Club</title>
 	<link href='http://fonts.googleapis.com/css?family=Lato|Open+Sans' rel='stylesheet' type='text/css'>
-	<style>
-		
-	body {
-		margin: 20px;
-		font-family: 'Open Sans', sans-serif;
-		color: #333;
-	}
-	
-	header, h1, h2, h3, h4, h5, h6 {
-		font-family: 'Lato', sans-serif;
-	}
-	
-	</style>
-	
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="/css/main.css">
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	@yield('css')
 </head>
 <body>
 	@section('header')
-		<header>
-			<img src="/images/logos/logo-small.png" />
-			<h1>
-				@section('title')
-				South Bay Volleyball Club
-				@show
-			</h1>
-		</header>
+		<div class="navbar navbar-default">
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="/">
+						<img class="logo" src="/images/logos/logo-extra-small.png" />
+						<span class="logo-name">South Bay Volleyball Club</span>
+					</a>
+				</div>
+				<div class="navbar-collapse collapse">
+					<ul class="nav navbar-nav">
+						@if (Auth::guest())
+							<li><a href="/register">Register</a></li>
+							<li><a href="/login">Log in</a></li>
+						@else
+							<li>{{ Auth::user()->name }}</li>
+							<li><a href="/logout">Log out</a></li>
+						@endif
+					</ul>
+				</div>
+			</div>
+		</div>
 	@show
-	<div class="main">
+	<div class="main container">
+		<h1>
+		@section('title')
+		@show
+		</h1>
+		@if($errors->has())
+			@foreach ($errors->all() as $error)
+				<div class="alert alert-danger">{{ $error }}</div>
+			@endforeach
+		@endif
 		@yield('content')
 	</div>
 	<script>

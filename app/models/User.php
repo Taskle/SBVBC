@@ -5,27 +5,25 @@ use Illuminate\Auth\Reminders\RemindableInterface;
 
 class User extends Eloquent implements UserInterface, RemindableInterface {
 
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */
 	protected $table = 'users';
-
-	/**
-	 * The attributes excluded from the model's JSON form.
-	 *
-	 * @var array
-	 */
 	protected $hidden = array('password');
+    protected $fillable = array('name', 'email', 'password', 'remember_token');
+    public static $rules = array(
+		'name' => 'Required|Min:3',
+		'email' => 'Required|Between:3,64|Email|Unique:users',
+		'password' => 'Required|AlphaNum|Between:4,32',
+	);
 
+	public static function validate($input) {
+        return Validator::make($input, self::$rules);
+	}
+	
 	/**
 	 * Get the unique identifier for the user.
 	 *
 	 * @return mixed
 	 */
-	public function getAuthIdentifier()
-	{
+	public function getAuthIdentifier() {
 		return $this->getKey();
 	}
 
@@ -34,8 +32,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	 *
 	 * @return string
 	 */
-	public function getAuthPassword()
-	{
+	public function getAuthPassword() {
 		return $this->password;
 	}
 
@@ -44,8 +41,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	 *
 	 * @return string
 	 */
-	public function getRememberToken()
-	{
+	public function getRememberToken() {
 		return $this->remember_token;
 	}
 
@@ -55,8 +51,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	 * @param  string  $value
 	 * @return void
 	 */
-	public function setRememberToken($value)
-	{
+	public function setRememberToken($value) {
 		$this->remember_token = $value;
 	}
 
@@ -65,8 +60,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	 *
 	 * @return string
 	 */
-	public function getRememberTokenName()
-	{
+	public function getRememberTokenName() {
 		return 'remember_token';
 	}
 
@@ -75,9 +69,20 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	 *
 	 * @return string
 	 */
-	public function getReminderEmail()
-	{
+	public function getReminderEmail() {
 		return $this->email;
 	}
+	
+    public function division()
+    {
+        return $this->belongsTo('User');
+    }
 
+	public function teams() {
+		return $this->belongsToMany('Team');
+	}
+
+	public function tournaments() {
+		return $this->belongsToMany('Tournament');
+	}
 }

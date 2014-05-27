@@ -187,5 +187,10 @@ return array(
 		'View'            => 'Illuminate\Support\Facades\View',
 
 	),
-
+	
+	/**
+	 * Custom keys and configurations
+	 */	
+	'stripe_secret_key' => $_SERVER['STRIPE_SECRET_KEY'],
+	'stripe_public_key' => $_SERVER['STRIPE_PUBLIC_KEY'],
 );
