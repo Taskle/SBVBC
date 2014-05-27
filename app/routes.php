@@ -12,13 +12,12 @@
  */
 
 Route::get('/', function() {
-	
+
 	if (Auth::check() && Auth::user()->role != 'Admin') {
-		
+
 		return View::make('home');
-	}
-	else {
-		
+	} else {
+
 		// get most recent tournament in database
 		$tournament = Tournament::find(1);
 		return View::make('index')->with('tournament', $tournament);
@@ -26,13 +25,13 @@ Route::get('/', function() {
 });
 
 Route::get('login', function() {
-	
+
 	if (Auth::check()) {
 		return Redirect::to('/');
 	}
-	
+
 	$user = new User;
-	return View::make('login')->with('user', $user);	
+	return View::make('login')->with('user', $user);
 });
 
 Route::post('login', function() {
@@ -42,23 +41,21 @@ Route::post('login', function() {
 		'password' => 'Required',
 	);
 
-    $v = Validator::make(Input::all(), $rules);
+	$v = Validator::make(Input::all(), $rules);
 
 	if ($v->passes()) {
 
 		// look up user via email
 		if (Auth::attempt(array(
-			'email' => Input::get('email'), 
-			'password' => Input::get('password')))) {
-			
+					'email' => Input::get('email'),
+					'password' => Input::get('password')))) {
+
 			return Redirect::intended('/login');
-		}
-		else {
+		} else {
 			return Redirect::to('/login')->withErrors('Invalid email or password');
 		}
-				
 	} else {
-		
+
 		return Redirect::to('/login')->withErrors($v->messages());
 	}
 });
@@ -69,31 +66,133 @@ Route::get('logout', function() {
 });
 
 Route::get('register', function() {
-	
+
 	if (Auth::check()) {
 		return Redirect::intended('/');
 	}
-	
+
 	$user = new User;
-	return View::make('register')->with('user', $user);
+
+	$tournament_id = Input::get('tournament');
+
+	if ($tournament_id) {
+		$tournament = Tournament::find($tournament_id);
+	} else {
+		$tournament = null;
+	}
+
+	$division_id = Input::get('division');
+
+	if ($division_id) {
+		$division = Division::find($division_id);
+	} else {
+		$division = null;
+	}
+
+	return View::make('register')
+					->with('user', $user)
+					->with('tournament', $tournament)
+					->with('division', $division)
+					->with('type', Input::get('type'));
 });
 
 Route::post('register', function() {
-	$user = new User;
-	$user->fill($_POST);
+	
+	$tournament_id = Input::get('tournament_id');
 
-	$v = User::validate(Input::all());
+	if ($tournament_id) {
+		$tournament = Tournament::find($tournament_id);
+	} else {
+		$tournament = null;
+	}
+
+	$division_id = Input::get('division_id');
+
+	if ($division_id) {
+		$division = Division::find($division_id);
+	} else {
+		$division = null;
+	}
+	
+	// default type to solo
+	$type = Input::get('type') ? Input::get('type') : 'solo';
+	
+	// fetch email from form provided
+	$email = Input::get('email') ? Input::get('email') :
+			Input::get('stripeEmail');
+	
+	// set random password if none provided
+	$password = Input::get('password') ? Input::get('password') :
+			$password = str_random(16);
+
+	$userParams = [
+		'first_name' => Input::get('first_name'),
+		'last_name' => Input::get('last_name'),
+		'email' => $email,
+		'password' => $password
+	];
+
+	$v = User::validate($userParams);
 
 	if ($v->passes()) {
 
-		User::create(array(
-			'name' => Input::get('name'),
-			'email' => Input::get('email'),
-			'password' => Hash::make(Input::get('password')),
-		));
+		$userParams['password'] = Hash::make($password);
+		
+		Stripe::setApiKey(Config::get('app.stripe_secret_key'));
+		
+		$stripeToken = Input::get('stripeToken');
+		$description = $email . ' - ' . 
+				$tournament->name . ' - ' . $division->name;
+			
+		$amount = $type == 'team' ?  $division->team_price :
+				$division->solo_price;
+		
+		// Create the charge on Stripe's servers - this will charge the user's card
+		try {
+			$charge = Stripe_Charge::create(array(
+				"amount" => $amount,
+				"currency" => "usd",
+				"card" => $stripeToken,
+				"description" => $description
+			));
+		} 
+		catch (Stripe_CardError $e) {
+			
+			$e_json = $e->getJsonBody();
+			$error = $e_json['error'];
+			// The card has been declined
+			// redirect back to checkout page
+			return Redirect::to('/register')
+				->withInput()->with('stripe_errors', $error['message']);
+		}
+
+		// save user's stripe info
+		$user = User::create($userParams);
+		$user->stripe_id = $charge->id;
+		$user->save();
+		
+		// associate with division and tournament
+		$user->tournaments()->save($tournament);
+		$user->divisions()->save($division);
+
+		// if this is a group, create new team accordingly
+		if ($type == 'team') {
+			
+			$team = Team::create([
+				name => $user->getFullName() . "'s team"
+			]);
+			
+			$team->tournaments()->save($tournament);
+			$team->divisions()->save($division);
+
+			// associate team to user
+			$user->teams()->save($team);
+		}
+		
+		// TODO: email confirmation to user
+		
 
 		return Redirect::to('/');
-		
 	} else {
 		return Redirect::to('/register')->withErrors($v->messages());
 	}

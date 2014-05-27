@@ -56,10 +56,10 @@
 					@endif
 				</div>
 				@if ($division->allow_solo_registration)
-					<a href="/register?type=solo&division={{ $division->id }}" class="btn btn-primary btn-block">Register Individual</a>
+					<a href="/register?type=solo&tournament={{ $tournament->id }}&division={{ $division->id }}" class="btn btn-primary btn-block">Register Individual</a>
 				@endif
 				@if ($division->allow_team_registration)
-					<a href="/register?type=team&division={{ $division->id }}" class="btn btn-primary btn-block">Register Team</a>
+					<a href="/register?type=team&tournament={{ $tournament->id }}&division={{ $division->id }}" class="btn btn-primary btn-block">Register Team</a>
 				@endif
 			</div>
 		</div>

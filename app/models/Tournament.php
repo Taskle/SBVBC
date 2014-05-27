@@ -3,7 +3,7 @@
 class Tournament extends Eloquent {
 
 	protected $table = 'tournaments';
-    protected $guarded = array('id');
+	protected $guarded = array('id');
 
 	/**
 	 * Get the unique identifier for the user.
@@ -25,4 +25,5 @@ class Tournament extends Eloquent {
 	public function teams() {
 		return $this->belongsToMany('Team');
 	}
+
 }

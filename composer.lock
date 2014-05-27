@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "80fb2cc19a794af47786ae00d8d450e2",
+    "hash": "2fbf4c208404947257d0cceaf696e1e8",
     "packages": [
         {
             "name": "classpreloader/classpreloader",
@@ -831,6 +831,54 @@
                 "stack"
             ],
             "time": "2014-01-28 19:42:24"
+        },
+        {
+            "name": "stripe/stripe-php",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stripe/stripe-php.git",
+                "reference": "0bba3d7c91e71a720367faa63d58f09cd9873d1f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/0bba3d7c91e71a720367faa63d58f09cd9873d1f",
+                "reference": "0bba3d7c91e71a720367faa63d58f09cd9873d1f",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "php": ">=5.2"
+            },
+            "require-dev": {
+                "simpletest/simpletest": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "lib/Stripe/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Stripe and contributors",
+                    "homepage": "https://github.com/stripe/stripe-php/contributors"
+                }
+            ],
+            "description": "Stripe PHP Library",
+            "homepage": "https://stripe.com/",
+            "keywords": [
+                "api",
+                "payment processing",
+                "stripe"
+            ],
+            "time": "2014-05-22 00:04:58"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -1740,6 +1788,7 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
+        "stripe/stripe-php": 20,
         "frozennode/administrator": 20
     },
     "platform": [

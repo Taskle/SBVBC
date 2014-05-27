@@ -3,8 +3,8 @@
 class Division extends Eloquent {
 
 	protected $table = 'divisions';
-    protected $guarded = array('id');
-	
+	protected $guarded = array('id');
+
 	/**
 	 * Get the unique identifier for the user.
 	 *
@@ -13,11 +13,10 @@ class Division extends Eloquent {
 	public function getAuthIdentifier() {
 		return $this->getKey();
 	}
-	
-    public function users()
-    {
-        return $this->hasMany('User');
-    }
+
+	public function users() {
+		return $this->belongsToMany('User');
+	}
 
 	public function teams() {
 		return $this->belongsToMany('Team');

@@ -4,6 +4,7 @@
 	"keywords": ["framework", "laravel"],
 	"license": "MIT",
 	"require": {
+		"stripe/stripe-php": "dev-master",
 		"laravel/framework": "4.1.*",
 	    "frozennode/administrator": "dev-master"
 	},

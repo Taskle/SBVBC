@@ -7,19 +7,18 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 
 	protected $table = 'users';
 	protected $hidden = array('password');
-    protected $fillable = array('first_name', 'last_name', 
-		'email', 'password', 'remember_token');
-    public static $rules = array(
+	protected $guarded = array('id', 'stripe_id');
+	public static $rules = array(
 		'first_name' => 'Required|Min:3',
 		'last_name' => 'Required|Min:3',
 		'email' => 'Required|Between:3,64|Email|Unique:users',
-		'password' => 'Required|AlphaNum|Between:4,32',
+		'password' => 'AlphaNum|Between:4,32',
 	);
 
 	public static function validate($input) {
-        return Validator::make($input, self::$rules);
+		return Validator::make($input, self::$rules);
 	}
-	
+
 	/**
 	 * Get the unique identifier for the user.
 	 *
@@ -74,7 +73,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	public function getReminderEmail() {
 		return $this->email;
 	}
-	
+
 	/**
 	 * Get the full name of the user
 	 *
@@ -83,11 +82,10 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	public function getFullName() {
 		return $this->first_name . ' ' . $this->last_name;
 	}
-	
-    public function division()
-    {
-        return $this->belongsTo('User');
-    }
+
+	public function divisions() {
+		return $this->belongsToMany('Division');
+	}
 
 	public function teams() {
 		return $this->belongsToMany('Team');
@@ -96,4 +94,5 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	public function tournaments() {
 		return $this->belongsToMany('Tournament');
 	}
+
 }
