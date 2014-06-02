@@ -35,6 +35,13 @@
 				'placeholder' => 'Last name',
 				'required' => true,
 	)) }}
+@if ($type == 'team')
+	{{ Form::text('team_name', $team ? $team->name : '', array(
+				'class' => 'form-control',
+				'placeholder' => 'Team name',
+				'required' => true,
+	)) }}
+@endif
 {{ Form::hidden('type', $type) }}
 
 @if ($division && $tournament)

@@ -95,9 +95,18 @@ Route::get('register', function() {
 	} else {
 		$division = null;
 	}
+	
+	$team_id = Input::get('team');
+
+	if ($team_id) {
+		$team = Team::find($division_id);
+	} else {
+		$team = null;
+	}
 
 	return View::make('register')
 					->with('user', $user)
+					->with('team', $team)
 					->with('tournament', $tournament)
 					->with('division', $division)
 					->with('type', Input::get('type'));
@@ -191,8 +200,9 @@ Route::post('register', function() {
 		// if this is a group, create new team accordingly
 		if ($type == 'team') {
 			
+			$teamName = Input::get('team_name');
 			$team = Team::create([
-				'name' => $user->getFullName() . "'s team"
+				'name' => $teamName ? $teamName : $user->getFullName() . "'s team"
 			]);
 			
 			$team->tournaments()->save($tournament);
