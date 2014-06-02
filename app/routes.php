@@ -212,8 +212,23 @@ Route::post('register', function() {
 			$user->teams()->save($team);
 		}
 		
-		// TODO: email confirmation to user
-		
+		$emailData['email'] = $email;
+		$emailData['password'] = $password;
+		$emailData['tournament'] = $tournament;
+		$emailData['division'] = $division;
+			
+		$subject = 'SBVBC registration confirmed';
+		if ($tournament) {
+			$subject .= ' for ' . $tournament->name;
+		}
+			
+		// send email confirmation to user
+		Mail::send(array('emails.welcome-html', 'emails.welcome-text'), 
+			$emailData, function($message) use ($email, $user, $subject) {
+			
+			$message->from('contact@sbvbc.org', 'SBVBC');
+			$message->to($email, $user->getFullName())->subject($subject);
+		});
 
 		return Redirect::to('/');
 	} else {

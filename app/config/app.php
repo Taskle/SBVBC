@@ -120,6 +120,7 @@ return array(
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
 
+		'Aws\Laravel\AwsServiceProvider',
 		'Way\Generators\GeneratorsServiceProvider',
 	    'Frozennode\Administrator\AdministratorServiceProvider',
 	),
@@ -188,6 +189,7 @@ return array(
 		'Validator'       => 'Illuminate\Support\Facades\Validator',
 		'View'            => 'Illuminate\Support\Facades\View',
 
+        'AWS'             => 'Aws\Laravel\AwsFacade',
 	),
 	
 	/**

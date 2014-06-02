@@ -6,7 +6,8 @@
 	"require": {
 		"stripe/stripe-php": "dev-master",
 		"laravel/framework": "4.1.*",
-	    "frozennode/administrator": "dev-master"
+	    "frozennode/administrator": "dev-master",
+	    "aws/aws-sdk-php-laravel": "1.*"
 	},
 	"require-dev": {
 		"way/generators": "2.*"
