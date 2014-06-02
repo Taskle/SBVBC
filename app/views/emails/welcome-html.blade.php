@@ -9,7 +9,13 @@
 		<div>
 			You are now registered for the {{ $tournament->name }}!<br />
 			<br />
-			If you registered for a team, you can edit your team name and members at <a href="http://www.sbvbc.org">http://www.sbvbc.org</a>.<br />
+			@if ($team)
+				Team name: {{ $team->name }}<br />
+				<br />
+				You can edit your team name and members at <a href="http://www.sbvbc.org">http://www.sbvbc.org</a>.<br />						
+			@else
+				If you registered for a team, you can edit your team name and members at <a href="http://www.sbvbc.org">http://www.sbvbc.org</a>.<br />			
+			@endif
 			<br />
 			Email: {{ $email }}<br />
 			Password: {{ $password }}<br />

@@ -34,3 +34,7 @@ header, h1, h2, h3, h4, h5, h6 {
 form input[type="submit"] {
 	margin-top: 10px;
 }
+
+.emphasis {
+	font-weight: bold;
+}

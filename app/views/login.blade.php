@@ -29,7 +29,7 @@
 				'placeholder' => 'New Password',
 	)) }}
 	Remember me
-{{ Form::submit('Register', array('class' => 'btn btn-primary btn-block')) }}
+{{ Form::submit('Login', array('class' => 'btn btn-primary btn-block')) }}
 {{ Form::close() }}
 
 @stop

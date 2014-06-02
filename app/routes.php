@@ -139,7 +139,7 @@ Route::post('register', function() {
 	
 	// set random password if none provided
 	$password = Input::get('password') ? Input::get('password') :
-			$password = str_random(16);
+			$password = getRandomPassword();
 
 	$userParams = [
 		'first_name' => Input::get('first_name'),
@@ -212,10 +212,12 @@ Route::post('register', function() {
 			$user->teams()->save($team);
 		}
 		
+		$emailData = [];
 		$emailData['email'] = $email;
 		$emailData['password'] = $password;
 		$emailData['tournament'] = $tournament;
 		$emailData['division'] = $division;
+		$emailData['team'] = $team;
 			
 		$subject = 'SBVBC registration confirmed';
 		if ($tournament) {
@@ -234,6 +236,126 @@ Route::post('register', function() {
 	} else {
 		return Redirect::to('/register')->withErrors($v->messages());
 	}
+});
+
+function getRandomPassword() {
+	return str_random(16);
+}
+
+Route::post('update-teammate', function() {
+	
+	$first_name = Input::get('first_name');
+	$last_name = Input::get('last_name');
+	$email = Input::get('email');
+	$team_id = Input::get('team_id');
+	$user_id = Input::get('user_id');
+	
+	if (!$first_name || !$last_name || !$email || !$team_id) {
+		return Redirect::to('/')->withErrors('Name, email, and team ID required');
+	}
+
+	// look up team
+	$team = Team::find($team_id);
+	
+	if (!$team) {
+		return Redirect::to('/')->withErrors('Team ' . $team_id . ' not found');
+	}
+	
+	// ensure current user is associated with this team
+	$found = false;
+	foreach ($team->users as $teammate) {
+		if ($teammate->id == Auth::user()->id) {
+			$found = true;
+			break;
+		}
+	}
+	
+	if (!$found) {
+		return Redirect::to('/')->withErrors('You are not associated with team #' 
+				. $team_id);
+	}
+	
+	if ($user_id) {
+		// change name / email of the given user
+		$found = false;
+		foreach ($team->users as $teammate) {
+			if ($teammate->id == $user_id) {
+				$found = true;
+				
+				// update this user's info
+				$teammate->first_name = $first_name;
+				$teammate->last_name = $last_name;
+				$teammate->email = $email;
+				$teammate->save();
+				break;
+			}
+		}
+	
+		if (!$found) {
+			return Redirect::to('/')->withErrors(
+					'That person was not found on your team');
+		}
+	}
+	else {
+		// create new user and associate with team
+		$teammate = new User;
+		
+		$password = getRandomPassword();
+		
+		$userParams = [
+			'first_name' => $first_name,
+			'last_name' => $last_name,
+			'email' => $email,
+			'password' => $password
+		];
+
+		$v = User::validate($userParams);
+
+		if ($v->passes()) {
+
+			$userParams['password'] = Hash::make($password);
+
+			// create user
+			$user = User::create($userParams);
+			
+			$user->save();
+		
+			// associate with division, tournament, and team
+			foreach ($team->tournaments as $tournament) {
+				$user->tournaments()->save($tournament);
+			}
+			foreach ($team->divisions as $division) {
+				$user->divisions()->save($division);
+			}
+			$user->teams()->save($team);
+		
+			$emailData = [];
+			$emailData['email'] = $email;
+			$emailData['password'] = $password;
+			$emailData['tournament'] = $tournament;
+			$emailData['division'] = $division;
+			$emailData['team'] = $team;
+			
+			$subject = 'SBVBC registration confirmed';
+			if ($tournament) {
+				$subject .= ' for ' . $tournament->name;
+			}
+			
+			// send welcome email to user
+			Mail::send(array('emails.welcome-html', 'emails.welcome-text'), 
+				$emailData, function($message) use ($email, $user, $subject) {
+
+				$message->from('contact@sbvbc.org', 'SBVBC');
+				$message->to($email, $user->getFullName())->subject($subject);
+			});
+		}
+		else {
+			return Redirect::to('/')->withErrors($v->messages());
+		}
+	}
+	
+	// go back to home on success
+	return Redirect::to('/');
 });
 
 Route::get('users', function() {

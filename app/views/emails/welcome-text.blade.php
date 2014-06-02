@@ -2,6 +2,14 @@ SBVBC Registration Confirmation
 
 You are now registered for the {{ $tournament->name }}!
 
+@if ($team)
+Team name: {{ $team->name }}
+
+You can edit your team name and members at http://www.sbvbc.org.					
+@else
+If you registered for a team, you can edit your team name and members at http://www.sbvbc.org.		
+@endif
+
 If you registered for a team, you can edit your team name and members at http://www.sbvbc.org.
 
 Email: {{ $email }}

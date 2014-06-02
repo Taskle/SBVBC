@@ -1,7 +1,51 @@
 @extends('layout')
 
 @section('css')
+<style>
+	
+#team-members-list {
+	padding-left: 0;
+}
 
+#team-members-list > li {	
+	list-style-type: none;
+	clear: both;
+}
+
+#team-members-list input {
+	width: 150px;
+	float: left;
+	margin-right: 10px;
+}
+
+#team-members-list input[type="submit"] {
+	margin-top: 0;
+}
+
+.team-member-me {
+	margin-bottom: 10px;
+}
+
+#btn-add-teammate {
+	clear: both;
+	margin-top: 10px;
+	width: 150px;
+}
+
+</style>
+@stop
+
+@section('js')
+<script>
+
+$(function() {
+	$('#btn-add-teammate').click(function() {
+		$('#btn-add-teammate').before('<li>' + 
+				$('.new-teammate-form').html() + '</li>');
+	});
+});
+
+</script>
 @stop
 
 @section('title')
@@ -57,15 +101,63 @@ Registration Details
 			</div>
 			<div class="panel-body">
 				<h4>Members:</h4>
-				<ul>
+				<ul id="team-members-list">
 					@foreach ($team->users()->get() as $member)
-					<li>{{ $member->getFullName() }}</li>
+					<li data-user-id="{{ $member->id }}">
+						@if ($member->id == Auth::user()->id)
+							<div class="team-member-me">
+								<span class="emphasis">{{ $member->getFullName() }}</span> - {{ $member->email }}
+							</div>
+						@else
+							{{ Form::open(array('url' => '/update-teammate', 'class' => 'form-signin')) }}
+								{{ Form::text('first_name', $member->first_name, array(
+												'class' => 'form-control',
+												'placeholder' => 'First name',
+									)) }}
+								{{ Form::text('last_name', $member->last_name, array(
+												'class' => 'form-control',
+												'placeholder' => 'Last name',
+									)) }}
+								{{ Form::text('email', $member->email, array(
+												'class' => 'form-control',
+												'placeholder' => 'Email',
+									)) }}
+								{{ Form::hidden('team_id', $team->id) }}
+								{{ Form::hidden('user_id', $member->id) }}
+								{{ Form::submit('Save', array('class' => 'btn btn-primary btn-block')) }}
+							{{ Form::close() }}
+						@endif
+					</li>
 					@endforeach
+					<button id="btn-add-teammate" class="btn btn-primary btn-block">Add new teammate</button>
 				</ul>
-				<b>Note: please contact jim (at) sbvbc.org to update your team member list.</b>
 			</div>
 		</div>
 	@endforeach
 @endif
+
+<div class="hidden">
+	<div class="new-teammate-form">		
+		{{ Form::open(array('url' => '/update-teammate',
+			'class' => 'form-signin'
+		)) }}
+			{{ Form::text('first_name', '', array(
+							'class' => 'form-control',
+							'placeholder' => 'First name',
+				)) }}
+			{{ Form::text('last_name', '', array(
+							'class' => 'form-control',
+							'placeholder' => 'Last name',
+				)) }}
+			{{ Form::text('email', '', array(
+							'class' => 'form-control',
+							'placeholder' => 'Email',
+				)) }}
+			{{ Form::hidden('team_id', $team->id) }}
+			{{ Form::hidden('user_id') }}
+			{{ Form::submit('Save & send email', array('class' => 'btn btn-primary btn-block')) }}
+		{{ Form::close() }}
+	</div>
+</div>
 
 @stop
