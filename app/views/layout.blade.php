@@ -52,6 +52,15 @@
 		@section('title')
 		@show
 		</h1>
+		@if(Session::has('success'))
+			<div class="alert alert-success">{{ Session::get('success') }}</div>
+		@endif
+		@if(Session::has('status'))
+			<div class="alert alert-info">{{ Session::get('status') }}</div>
+		@endif
+		@if(Session::has('error'))
+			<div class="alert alert-danger">{{ Session::get('error') }}</div>
+		@endif
 		@if($errors->has())
 			@foreach ($errors->all() as $error)
 				<div class="alert alert-danger">{{ $error }}</div>

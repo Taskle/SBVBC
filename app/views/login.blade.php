@@ -7,6 +7,11 @@
 		padding: 15px;
 		margin: 0 auto;
 	}
+	
+	#forgot-password-link {
+		margin-top: 10px;
+		display: block;
+	}
 </style>
 @stop
 
@@ -30,6 +35,7 @@
 	)) }}
 	Remember me
 {{ Form::submit('Login', array('class' => 'btn btn-primary btn-block')) }}
+<a id="forgot-password-link" href="/password/remind">Forgot password?</a>
 {{ Form::close() }}
 
 @stop

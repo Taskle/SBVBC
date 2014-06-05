@@ -72,6 +72,8 @@ Route::get('logout', function() {
 	return Redirect::intended('/');
 });
 
+Route::controller('password', 'RemindersController');
+
 Route::get('register', function() {
 
 	if (Auth::check()) {
