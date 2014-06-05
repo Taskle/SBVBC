@@ -7,9 +7,13 @@
 		<h2>SBVBC Registration Confirmation</h2>
 
 		<div>
-			You are now registered for the {{ $tournament->name }}!<br />
+                        @if (isset($tournament) && isset($tournament->name))
+                            You are now registered for the {{ $tournament->name }}!<br />
+                        @else
+                            You are now registered for the South Bay Volleyball Club!<br />
+                        @endif
 			<br />
-			@if ($team)
+			@if (isset($team) && isset($team->name))
 				Team name: {{ $team->name }}<br />
 				<br />
 				You can edit your team name and members at <a href="http://www.sbvbc.org">http://www.sbvbc.org</a>.<br />						

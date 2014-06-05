@@ -13,7 +13,7 @@
 
 Route::get('/', function() {
 
-	if (Auth::check() && Auth::user()->role != 'Admin') {
+	if (Auth::check()) { // && Auth::user()->role != 'Admin') {
 
 		$tournament = Auth::user()->tournaments()->get();
 		$divisions = Auth::user()->divisions()->get();
@@ -334,12 +334,16 @@ Route::post('update-teammate', function() {
 			$emailData = [];
 			$emailData['email'] = $email;
 			$emailData['password'] = $password;
-			$emailData['tournament'] = $tournament;
-			$emailData['division'] = $division;
+			$emailData['tournament'] = isset($tournament) ? 
+                                $tournament : '(no tournament assigned yet)';
+			$emailData['division'] = isset($division) ? 
+                                $division : '(no division assigned yet)';
 			$emailData['team'] = $team;
+			$emailData['team'] = isset($team) ? 
+                                $team : '(no team assigned yet)';
 			
 			$subject = 'SBVBC registration confirmed';
-			if ($tournament) {
+			if (isset($tournament) && isset($tournament->name)) {
 				$subject .= ' for ' . $tournament->name;
 			}
 			

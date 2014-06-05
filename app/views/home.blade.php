@@ -26,7 +26,7 @@
 	margin-bottom: 10px;
 }
 
-#btn-add-teammate {
+.btn-add-teammate {
 	clear: both;
 	margin-top: 10px;
 	width: 150px;
@@ -39,10 +39,12 @@
 <script>
 
 $(function() {
-	$('#btn-add-teammate').click(function() {
-		$('#btn-add-teammate').before('<li>' + 
-				$('.new-teammate-form').html() + '</li>');
-	});
+	$('.btn-add-teammate').click(function() {            
+            $('.new-teammate-form input[name="team_id"')
+                    .val($(this).data('team-id'));
+            $(this).before('<li>' + 
+                    $('.new-teammate-form').html() + '</li>');
+	});   
 });
 
 </script>
@@ -129,7 +131,7 @@ Registration Details
 						@endif
 					</li>
 					@endforeach
-					<button id="btn-add-teammate" class="btn btn-primary btn-block">Add new teammate</button>
+					<button data-team-id="{{ $team->id }}" class="btn-add-teammate btn btn-primary btn-block">Add new teammate</button>
 				</ul>
 			</div>
 		</div>
@@ -153,7 +155,7 @@ Registration Details
 							'class' => 'form-control',
 							'placeholder' => 'Email',
 				)) }}
-			{{ Form::hidden('team_id', $team->id) }}
+			{{ Form::hidden('team_id', '') }}
 			{{ Form::hidden('user_id') }}
 			{{ Form::submit('Save & send email', array('class' => 'btn btn-primary btn-block')) }}
 		{{ Form::close() }}

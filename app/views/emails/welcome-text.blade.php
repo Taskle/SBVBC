@@ -1,8 +1,12 @@
 SBVBC Registration Confirmation
 
+@if (isset($tournament) && isset($tournament->name))
 You are now registered for the {{ $tournament->name }}!
+@else
+You are now registered for the South Bay Volleyball Club!
+@endif
 
-@if ($team)
+@if (isset($team) && isset($team->name))
 Team name: {{ $team->name }}
 
 You can edit your team name and members at http://www.sbvbc.org.					
