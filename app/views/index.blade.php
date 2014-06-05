@@ -28,6 +28,7 @@
 	<div class="jumbotron-background">
 		<div class="container">
 			<h1>{{ $tournament->name }}</h1>
+			<h2>{{ (new DateTime($tournament->date))->format('n/d') }} Open Grass Tournament</h2>
 			<p>{{ $tournament->description }}</p>
 		</div>
 	</div>
