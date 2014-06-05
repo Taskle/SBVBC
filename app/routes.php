@@ -219,10 +219,13 @@ Route::post('register', function() {
 		$emailData['password'] = $password;
 		$emailData['tournament'] = $tournament;
 		$emailData['division'] = $division;
-		$emailData['team'] = $team;
-			
+                
+		if (isset($team)) {
+			$emailData['team'] = $team;
+		}
+                
 		$subject = 'SBVBC registration confirmed';
-		if ($tournament) {
+		if (isset($tournament) && isset($tournament->name)) {
 			$subject .= ' for ' . $tournament->name;
 		}
 			
