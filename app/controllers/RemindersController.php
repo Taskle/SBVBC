@@ -20,7 +20,7 @@ class RemindersController extends Controller {
 	public function postRemind()
 	{
 		$response = Password::remind(Input::only('email'), function($message) {
-			$message->subject(trans('messages.password_reset')); 
+			$message->subject('Password reset requested'); 
 		});
 		
 		switch ($response) {
