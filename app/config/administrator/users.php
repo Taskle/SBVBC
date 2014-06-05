@@ -57,6 +57,11 @@ return array(
 			'type' => 'relationship',
 			'name_field' => 'name',
 		),
+		'divisions' => array(
+			'title' => 'Divisions',
+			'type' => 'relationship',
+			'name_field' => 'name',
+		),
 		'tournaments' => array(
 			'title' => 'Tournaments',
 			'type' => 'relationship',
@@ -83,6 +88,11 @@ return array(
 		),
 		'teams' => array(
 			'title' => 'Teams',
+			'type' => 'relationship',
+			'name_field' => 'name',
+		),
+		'divisions' => array(
+			'title' => 'Divisions',
 			'type' => 'relationship',
 			'name_field' => 'name',
 		),
