@@ -82,12 +82,12 @@ Registration Details
 			<div class="panel-body">
 				<p>{{ $division->description }}</p>
 				@if ($division->allow_team_registration && $division->allow_solo_registration)
-				<span class="emphasis">${{ $division->team_price / 100.0 }}</span> for {{ $division->team_size }} people, <span class="emphasis">${{ $division->additional_team_member_price / 100.0 }}</span> per additional
+				<span class="emphasis">${{ $division->formatted_team_price }}</span> for {{ $division->team_size }} people, <span class="emphasis">${{ $division->formatted_additional_team_member_price }}</span> per additional
 					${{ $division->solo_price }} per person (w/o team)
 				@elseif ($division->allow_team_registration)
-				<span class="emphasis">${{ $division->team_price / 100.0 }}</span> for {{ $division->team_size }} people, <span class="emphasis">${{ $division->additional_team_member_price / 100.0 }}</span> per additional
+				<span class="emphasis">${{ $division->formatted_team_price }}</span> for {{ $division->team_size }} people, <span class="emphasis">${{ $division->formatted_additional_team_member_price }}</span> per additional
 				@elseif ($division->allow_solo_registration)
-					<span class="emphasis">${{ $division->solo_price / 100.0 }}</span> per person
+					<span class="emphasis">${{ $division->formatted_solo_price }}</span> per person
 				@endif
 			</div>
 		</div>

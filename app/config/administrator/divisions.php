@@ -85,15 +85,21 @@ return array(
 			'type' => 'number',
 		),
 		'solo_price' => array(
-			'title' => 'Price per individual (in CENTS)',
+			'title' => 'Price per individual',
+                        'symbol' => '$',
+                        'decimals' => 2,
 			'type' => 'number',
 		),
 		'team_price' => array(
-			'title' => 'Price per team (in CENTS)',
+			'title' => 'Price per team',
+                        'symbol' => '$',
+                        'decimals' => 2,
 			'type' => 'number',
 		),
 		'additional_team_member_price' => array(
-			'title' => 'Team price for each additional person (in CENTS)',
+			'title' => 'Team price for each additional person',
+                        'symbol' => '$',
+                        'decimals' => 2,
 			'type' => 'number',
 		),
 		'allow_team_registration' => array(

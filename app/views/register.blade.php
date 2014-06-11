@@ -56,9 +56,9 @@
 		src="https://checkout.stripe.com/checkout.js" class="stripe-button"
 		data-key="{{ Config::get('app.stripe_public_key') }}"
 		@if ($type == 'team')
-			data-amount="{{ $division->team_price }}"
+			data-amount="{{ $division->team_price * 100.0 }}"
 		@else
-			data-amount="{{ $division->solo_price }}"
+			data-amount="{{ $division->solo_price * 100.0 }}"
 		@endif
 		@if ($tournament)
 			data-name="{{ $tournament->name }}"
