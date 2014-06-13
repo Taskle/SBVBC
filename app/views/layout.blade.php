@@ -10,6 +10,10 @@
 	<link rel="stylesheet" href="/css/main.css">
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+	<script src="/js/jquery.placeholder.min.js"></script>
+	<script>
+	    $(":input[placeholder]").placeholder();
+	</script>
 	@yield('css')
 	@yield('js')
 </head>
