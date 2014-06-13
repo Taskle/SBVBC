@@ -30,6 +30,7 @@
 	clear: both;
 	margin-top: 10px;
 	width: 150px;
+	cursor: pointer; /* hack to fix iPhone not registering click */
 }
 
 </style>
@@ -40,7 +41,7 @@
 
 $(function() {
 	$(document).on('click touchstart', '.btn-add-teammate', function() {
-		$('.new-teammate-form input[name="team_id"')
+		$('.new-teammate-form input[name="team_id"]')
 				.val($(this).data('team-id'));
 		$(this).before('<li>' + 
 				$('.new-teammate-form').html() + '</li>');
