@@ -49,6 +49,9 @@ return array(
 		'last_name' => array(
 			'title' => 'Last Name',
 		),
+		'email' => array(
+			'title' => 'Email address',
+		),
 		'rating' => array(
 			'title' => 'Rating',
 		),
@@ -79,6 +82,10 @@ return array(
 		),
 		'last_name' => array(
 			'title' => 'Last Name',
+			'type' => 'text',
+		),
+		'email' => array(
+			'title' => 'Email address',
 			'type' => 'text',
 		),
 		'rating' => array(

@@ -19,7 +19,7 @@
 }
 
 #team-members-list input[type="submit"] {
-	margin-top: 0;
+	margin: 0 0 10px 0;
 }
 
 .team-member-me {
@@ -39,11 +39,11 @@
 <script>
 
 $(function() {
-	$('.btn-add-teammate').click(function() {            
-            $('.new-teammate-form input[name="team_id"')
-                    .val($(this).data('team-id'));
-            $(this).before('<li>' + 
-                    $('.new-teammate-form').html() + '</li>');
+	$(document).on('click touchstart', '.btn-add-teammate', function() {
+		$('.new-teammate-form input[name="team_id"')
+				.val($(this).data('team-id'));
+		$(this).before('<li>' + 
+				$('.new-teammate-form').html() + '</li>');
 	});   
 });
 
@@ -124,7 +124,7 @@ Registration Details
 												'class' => 'form-control',
 												'placeholder' => 'Email',
 									)) }}
-								{{ Form::hidden('team_id', $team->id) }}
+								{{ Form::hidden('team_id', isset($team) ? $team->id : '') }}
 								{{ Form::hidden('user_id', $member->id) }}
 								{{ Form::submit('Save', array('class' => 'btn btn-primary btn-block')) }}
 							{{ Form::close() }}
