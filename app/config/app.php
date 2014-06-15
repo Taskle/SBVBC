@@ -195,7 +195,9 @@ return array(
 	/**
 	 * Custom keys and configurations
 	 */	
-	'stripe_secret_key' => $_SERVER['STRIPE_SECRET_KEY'],
-	'stripe_public_key' => $_SERVER['STRIPE_PUBLIC_KEY'],
-	'error_email' => 'webmaster@sbvbc.org'
+	'error_email' => 'webmaster@sbvbc.org',
+	'stripe' => array(
+		'api_key' => $_SERVER['STRIPE_SECRET_KEY'],
+		'publishable_key' => $_SERVER['STRIPE_PUBLIC_KEY']
+	)
 );

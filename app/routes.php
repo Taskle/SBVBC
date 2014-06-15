@@ -15,14 +15,48 @@ Route::get('/', function() {
 
 	if (Auth::check()) { // && Auth::user()->role != 'Admin') {
 
-		$tournament = Auth::user()->tournaments()->get();
-		$divisions = Auth::user()->divisions()->get();
-		$teams = Auth::user()->teams()->get();
+		$context = array(
+			'myTournaments' => Auth::user()->tournaments()->get(),
+			'myDivisions' => Auth::user()->divisions()->get(),
+			'myTeams' => Auth::user()->teams()->get(),
+		);
 		
-		return View::make('home')
-				->with('tournaments', $tournament)
-				->with('divisions', $divisions)
-				->with('teams', $teams);
+		if (Auth::user()->role == 'Admin') {
+			$context['tournaments'] = Tournament::all();
+			
+			// look up payment status for every user
+			Stripe::setApiKey(Config::get('app.stripe.api_key'));
+			$context['paymentStatus'] = array();
+			$users = User::all();
+			
+			$charges = Stripe_Charge::all();
+			
+			$numCharges = count($charges->data);
+			for ($i = 0; $i < $numCharges; $i++) {
+
+				$charge = $charges->data[$i];
+				
+				if ($charge->card->name) {
+					
+					// get total minus refund
+					$amount = $charge->amount;
+					if ($charge->refunds) {
+						foreach ($charge->refunds as $refund) {
+							$amount -= $refund->amount;
+						}
+					}
+					
+					if (!isset($context['paymentStatus'][$charge->card->name])) {
+						$context['paymentStatus'][$charge->card->name] = 0;
+					}
+					
+					$context['paymentStatus'][$charge->card->name] += 
+							($amount / 100.0);
+				}
+			}
+		}
+		
+		return View::make('home')->with($context);
 	} else {
 
 		// get most recent tournament in database
@@ -156,7 +190,7 @@ Route::post('register', function() {
 
 		$userParams['password'] = Hash::make($password);
 		
-		Stripe::setApiKey(Config::get('app.stripe_secret_key'));
+		Stripe::setApiKey(Config::get('app.stripe.api_key'));
 		
 		$stripeToken = Input::get('stripeToken');
 		$description = $email . ' - ' . 

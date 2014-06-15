@@ -4,15 +4,15 @@ class Division extends Eloquent {
 
 	protected $table = 'divisions';
 	protected $guarded = array('id');
-        
-        private function prettyFormatDollarAmount($amt) {
-                if (($amt * 100) % 100 == 0) {
-                    return number_format($amt, 0);
-                }
-                else {
-                    return $amt;
-                }
-        }
+
+	private function prettyFormatDollarAmount($amt) {
+			if (($amt * 100) % 100 == 0) {
+				return number_format($amt, 0);
+			}
+			else {
+				return $amt;
+			}
+	}
 
 	/** accessor for using in admin views, etc.
 	 * 

@@ -54,7 +54,7 @@
 	<form action="" method="POST">
 	  <script
 		src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-		data-key="{{ Config::get('app.stripe_public_key') }}"
+		data-key="{{ Config::get('app.stripe.publishable_key') }}"
 		@if ($type == 'team')
 			data-amount="{{ $division->team_price * 100.0 }}"
 		@else
