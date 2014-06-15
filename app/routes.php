@@ -29,7 +29,7 @@ Route::get('/', function() {
 			$context['paymentStatus'] = array();
 			$users = User::all();
 			
-			$charges = Stripe_Charge::all();
+			$charges = Stripe_Charge::all(array('limit' => 1000));
 			
 			$numCharges = count($charges->data);
 			for ($i = 0; $i < $numCharges; $i++) {
