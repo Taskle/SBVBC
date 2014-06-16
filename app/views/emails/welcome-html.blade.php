@@ -21,8 +21,10 @@
 				If you registered for a team, you can edit your team name and members at <a href="http://www.sbvbc.org">http://www.sbvbc.org</a>.<br />			
 			@endif
 			<br />
-			Email: {{ $email }}<br />
-			Password: {{ $password }}<br />
+			@if ($isNewUser)
+				Email: {{ $email }}<br />
+				Password: {{ $password }}<br />
+			@endif
 			<br />
 			If you have any questions or problems, please reply to this email or contact us at <a href="mailto:contact@sbvbc.org">contact@sbvbc.org</a>.
 		</div>

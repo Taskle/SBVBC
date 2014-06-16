@@ -16,7 +16,9 @@ If you registered for a team, you can edit your team name and members at http://
 
 If you registered for a team, you can edit your team name and members at http://www.sbvbc.org.
 
+@if ($isNewUser)
 Email: {{ $email }}
 Password: {{ $password }}
+@endif
 
 If you have any questions or problems, please reply to this email or contact us at contact@sbvbc.org.

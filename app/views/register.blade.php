@@ -24,13 +24,13 @@
 	<p>{{ $tournament->name }} - {{ $division->name }}</p>
 @endif
 
-{{ Form::text('first_name', $user->name, array(
+{{ Form::text('first_name', $user->first_name, array(
 				'class' => 'form-control',
 				'placeholder' => 'First name',
 				'required' => true,
 				'autofocus' => true,
 	)) }}
-{{ Form::text('last_name', $user->name, array(
+{{ Form::text('last_name', $user->last_name, array(
 				'class' => 'form-control',
 				'placeholder' => 'Last name',
 				'required' => true,
@@ -64,6 +64,9 @@
 			data-name="{{ $tournament->name }}"
 		@else
 			data-name="South Bay Volleyball Club"
+		@endif
+		@if ($user->email)
+			data-email="{{ $user->email }}"
 		@endif
 		data-description="{{ $division->name }}"
 		data-image="/images/logos/logo-large-square.png">

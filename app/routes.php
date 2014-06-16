@@ -117,10 +117,11 @@ Route::controller('password', 'RemindersController');
 Route::get('register', function() {
 
 	if (Auth::check()) {
-		return Redirect::intended('/');
+		$user = Auth::user();
 	}
-
-	$user = new User;
+	else {
+		$user = new User;
+	}
 
 	$tournament_id = Input::get('tournament');
 
@@ -175,121 +176,151 @@ Route::post('register', function() {
 	// default type to solo
 	$type = Input::get('type') ? Input::get('type') : 'solo';
 	
-	// fetch email from form provided
-	$email = Input::get('email') ? Input::get('email') :
-			Input::get('stripeEmail');
-	
-	// set random password if none provided
-	$password = Input::get('password') ? Input::get('password') :
-			$password = getRandomPassword();
+	if (Auth::check()) {
+		$fullName = Auth::user()->full_name;
+		$email = Auth::user()->email;
+	}
+	else {
+		// fetch email from form provided
+		$email = Input::get('email') ? Input::get('email') :
+				Input::get('stripeEmail');
 
-	$userParams = [
-		'first_name' => Input::get('first_name'),
-		'last_name' => Input::get('last_name'),
-		'email' => $email,
-		'password' => $password
-	];
+		// set random password if none provided
+		$password = Input::get('password') ? Input::get('password') :
+				$password = getRandomPassword();
 
-	$v = User::validate($userParams);
+		$userParams = [
+			'first_name' => Input::get('first_name'),
+			'last_name' => Input::get('last_name'),
+			'email' => $email,
+			'password' => $password
+		];
 
-	if ($v->passes()) {
+		$v = User::validate($userParams);
+
+		if (!$v->passes()) {
+			return Redirect::to('/register')->withErrors($v->messages());
+		}
 
 		$userParams['password'] = Hash::make($password);
+		$fullName = $userParams['first_name'] . ' ' . $userParams['last_name'];
+	}
+
+	Stripe::setApiKey(Config::get('app.stripe.api_key'));
+
+	$stripeToken = Input::get('stripeToken');
+	$description = $email . ' - ' . 
+			$tournament->name . ' - ' . $division->name;
+
+			// get price in cents for sending to stripe
+	$amount = $type == 'team' ?  ($division->team_price * 100) :
+			($division->solo_price * 100);
+
+	// Create the charge on Stripe's servers - this will charge the user's card
+	try {
 		
-		Stripe::setApiKey(Config::get('app.stripe.api_key'));
-		
-		$stripeToken = Input::get('stripeToken');
-		$description = $email . ' - ' . 
-				$tournament->name . ' - ' . $division->name;
+		if (Auth::check() && Auth::user()->stripe_id) {
+			$customer = Stripe_Customer::retrieve(Auth::user()->stripe_id);
 			
-                // get price in cents for sending to stripe
-		$amount = $type == 'team' ?  ($division->team_price * 100) :
-				($division->solo_price * 100);
+			// update card on customer to this one
+			$customer->card = $stripeToken;
+			$customer->save();
+		}
 		
-		// Create the charge on Stripe's servers - this will charge the user's card
-		try {
+		// if customer doesn't exist or wasn't retrieved, create a new one now
+		if (!isset($customer) || !$customer) {
 			$customer = Stripe_Customer::create(array(
 				"card" => $stripeToken,
 				"email" => $email,
-				"description" => $userParams['first_name'] . ' ' .
-					$userParams['last_name']
+				"description" => $fullName
 			));
-			
-			// Charge the Customer instead of the card
-			$charge = Stripe_Charge::create(array(
-				"amount" => $amount,
-				"currency" => "usd",
-				"customer" => $customer->id,
-				"description" => $description
-			));
-		} 
-		catch (Stripe_CardError $e) {
-			
-			$e_json = $e->getJsonBody();
-			$error = $e_json['error'];
-			// The card has been declined
-			// redirect back to checkout page
-			return Redirect::to('/register')
-				->withInput()->with('stripe_errors', $error['message']);
 		}
 
-		// create and log in user
+		// Charge the Customer instead of the card
+		$charge = Stripe_Charge::create(array(
+			"amount" => $amount,
+			"currency" => "usd",
+			"customer" => $customer->id,
+			"description" => $description
+		));
+	} 
+	catch (Stripe_CardError $e) {
+
+		$e_json = $e->getJsonBody();
+		$error = $e_json['error'];
+		// The card has been declined
+		// redirect back to checkout page
+		return Redirect::to('/register')
+			->withInput()->with('stripe_errors', $error['message']);
+	}
+
+	// create and log in user if not logged in
+	if (Auth::check()) {
+		$isNewUser = false;
+		$user = Auth::user();
+	}
+	else {
+		$isNewUser = true;
 		$user = User::create($userParams);
 		Auth::attempt([
 			'email' => $email,
 			'password' => $password
 		]);
-		
-		// save user's stripe info
-		$user->stripe_id = $customer->id;
-		$user->save();
-		
-		// associate with division and tournament
-		$user->tournaments()->save($tournament);
-		$user->divisions()->save($division);
+	}
 
-		// if this is a group, create new team accordingly
-		if ($type == 'team') {
-			
-			$teamName = Input::get('team_name');
-			$team = Team::create([
-				'name' => $teamName ? $teamName : $user->getFullName() . "'s team"
-			]);
-			
-			$team->tournaments()->save($tournament);
-			$team->divisions()->save($division);
+	// save user's stripe info
+	$user->stripe_id = $customer->id;
+	$user->save();
 
-			// associate team to user
-			$user->teams()->save($team);
-		}
-		
-		$emailData = [];
+	// associate with division and tournament
+	$user->tournaments()->save($tournament);
+	$user->divisions()->save($division);
+
+	// if this is a group, create new team accordingly
+	if ($type == 'team') {
+
+		$teamName = Input::get('team_name');
+		$team = Team::create([
+			'name' => $teamName ? $teamName : $user->getFullName() . "'s team"
+		]);
+
+		$team->tournaments()->save($tournament);
+		$team->divisions()->save($division);
+
+		// associate team to user
+		$user->teams()->save($team);
+	}
+
+	$emailData = array(
+		'isNewUser' => $isNewUser
+	);
+	
+	if ($isNewUser) {
 		$emailData['email'] = $email;
 		$emailData['password'] = $password;
-		$emailData['tournament'] = $tournament;
-		$emailData['division'] = $division;
-                
-		if (isset($team)) {
-			$emailData['team'] = $team;
-		}
-                
-		$subject = 'SBVBC registration confirmed';
-		if (isset($tournament) && isset($tournament->name)) {
-			$subject .= ' for ' . $tournament->name;
-		}
-			
-		// send email confirmation to user
-		Mail::send(array('emails.welcome-html', 'emails.welcome-text'), 
-			$emailData, function($message) use ($email, $user, $subject) {
-			
-			$message->from('contact@sbvbc.org', 'SBVBC');
-			$message->to($email, $user->getFullName())->subject($subject);
-		});
-
-		return Redirect::to('/');
-	} else {
-		return Redirect::to('/register')->withErrors($v->messages());
 	}
+	
+	$emailData['tournament'] = $tournament;
+	$emailData['division'] = $division;
+
+	if (isset($team)) {
+		$emailData['team'] = $team;
+	}
+
+	$subject = 'SBVBC registration confirmed';
+	if (isset($tournament) && isset($tournament->name)) {
+		$subject .= ' for ' . $tournament->name;
+	}
+
+	// send email confirmation to user
+	Mail::send(array('emails.welcome-html', 'emails.welcome-text'), 
+		$emailData, function($message) use ($email, $user, $subject) {
+
+		$message->from('contact@sbvbc.org', 'SBVBC');
+		$message->to($email, $user->getFullName())->subject($subject);
+	});
+
+	return Redirect::to('/');
 });
 
 function getRandomPassword() {
