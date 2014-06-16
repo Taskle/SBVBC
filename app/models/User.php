@@ -81,6 +81,20 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	public function getFullNameAttribute() {
 		return ucfirst($this->first_name) . ' ' . ucfirst($this->last_name);
 	}
+	
+	/**
+	 * Gets team user is on for the given tournament
+	 */
+	public function getTeam($tournamentId) {
+		return $this->teams->filter(function($team) use ($tournamentId) {
+			foreach ($team->tournaments as $tournament) {
+				if ($tournamentId == $tournament->id) {
+					return true;
+				}
+			}
+			return false;
+		})->first();
+	}
 
 	/**
 	 * Get the full name of the user

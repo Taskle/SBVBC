@@ -38,7 +38,23 @@ class Division extends Eloquent {
                 return $this->prettyFormatDollarAmount(
                         $this->additional_team_member_price);
 	}
-
+	
+	/**
+	 * Returns all players without teams
+	 */
+	public function getUnassignedPlayers($tournamentId) {
+		return $this->users->filter(function($user) use ($tournamentId) {
+			return (count($user->teams->filter(function($team) use ($tournamentId) {
+				foreach ($team->tournaments as $tournament) {
+					if ($tournamentId == $tournament->id) {
+						return true;
+					}
+				}
+				return false;
+			})) == 0);
+		});
+	}
+	
 	/**
 	 * Get the unique identifier for the user.
 	 *

@@ -92,24 +92,45 @@ $(function() {
 								</tr>
 							</thead>
 							<tbody>
-							@foreach ($division->users()->get() as $member)
-								@foreach ($member->teams()->get() as $team)
+							@foreach ($division->getUnassignedPlayers($tournament->id) as $user)
+								<tr>
+									<td></td>
+									<td><a href="/admin/users/{{ $user->id }}">
+										{{ $user->full_name }}
+									</a></td>
+									<td><a href="mailto:{{ $user->email }}">
+										{{ $user->email }}
+									</a></td>
+									<td><a href="/admin/users/{{ $user->id }}">
+										{{ $user->rating }}
+									</a></td>
+									<td>
+										@if (isset($paymentStatus[$user->email]))
+											Paid ${{ $paymentStatus[$user->email] }}
+										@endif
+									</td>
+								</tr>
+							@endforeach
+							@foreach ($division->teams->sortBy(function($team) {
+								return $team->name;
+							}) as $team)
+								@foreach ($team->users()->get() as $user)
 									<tr>
 										<td><a href="/admin/teams/{{ $team->id }}">
 												{{ $team->name }}</a>
 										</td>
-										<td><a href="/admin/users/{{ $member->id }}">
-											{{ $member->full_name }}
+										<td><a href="/admin/users/{{ $user->id }}">
+											{{ $user->full_name }}
 										</a></td>
-										<td><a href="mailto:{{ $member->email }}">
-											{{ $member->email }}
+										<td><a href="mailto:{{ $user->email }}">
+											{{ $user->email }}
 										</a></td>
-										<td><a href="/admin/users/{{ $member->id }}">
-											{{ $member->rating }}
+										<td><a href="/admin/users/{{ $user->id }}">
+											{{ $user->rating }}
 										</a></td>
 										<td>
-											@if (isset($paymentStatus[$member->email]))
-												Paid ${{ $paymentStatus[$member->email] }}
+											@if (isset($paymentStatus[$user->email]))
+												Paid ${{ $paymentStatus[$user->email] }}
 											@endif
 										</td>
 									</tr>
@@ -131,31 +152,35 @@ $(function() {
 								</tr>
 							</thead>
 							<tbody>
-							@foreach ($division->teams()->get() as $team)
-								@foreach ($team->users()->get() as $member)
-									<tr>
-										<td><a href="/admin/users/{{ $member->id }}">
-											{{ $member->first_name }}
-										</a></td>
-										<td><a href="/admin/users/{{ $member->id }}">
-											{{ $member->last_name }}
-										</a></td>
-										<td><a href="mailto:{{ $member->email }}">
-											{{ $member->email }}
-										</a></td>
-										<td><a href="/admin/users/{{ $member->id }}">
-											{{ $member->rating }}
-										</a></td>
-										<td>
-											@if (isset($paymentStatus[$member->email]))
-												Paid ${{ $paymentStatus[$member->email] }}
-											@endif
-										</td>
-										<td><a href="/admin/teams/{{ $team->id }}">
+							@foreach ($division->users->sortBy(function($user) {
+								return $user->full_name;
+							}) as $user)
+								<tr>
+									<td><a href="/admin/users/{{ $user->id }}">
+										{{ $user->first_name }}
+									</a></td>
+									<td><a href="/admin/users/{{ $user->id }}">
+										{{ $user->last_name }}
+									</a></td>
+									<td><a href="mailto:{{ $user->email }}">
+										{{ $user->email }}
+									</a></td>
+									<td><a href="/admin/users/{{ $user->id }}">
+										{{ $user->rating }}
+									</a></td>
+									<td>
+										@if (isset($paymentStatus[$user->email]))
+											Paid ${{ $paymentStatus[$user->email] }}
+										@endif
+									</td>
+									<td>
+										<?php $team = $user->getTeam($tournament->id);
+										if (isset($team) && $team) { ?>
+											<a href="/admin/teams/{{ $team->id }}">
 												{{ $team->name }}</a>
-										</td>
-									</tr>
-								@endforeach
+										<?php } ?>
+									</td>
+								</tr>
 							@endforeach
 							</tbody>
 							</table>
@@ -191,28 +216,28 @@ $(function() {
 			<div class="panel-body">
 				<h4>Members:</h4>
 				<ul id="team-members-list">
-					@foreach ($team->users()->get() as $member)
-					<li data-user-id="{{ $member->id }}">
-						@if ($member->id == Auth::user()->id)
+					@foreach ($team->users()->get() as $user)
+					<li data-user-id="{{ $user->id }}">
+						@if ($user->id == Auth::user()->id)
 							<div class="team-member-me">
-								<span class="emphasis">{{ $member->getFullName() }}</span> - {{ $member->email }}
+								<span class="emphasis">{{ $user->getFullName() }}</span> - {{ $user->email }}
 							</div>
 						@else
 							{{ Form::open(array('url' => '/update-teammate', 'class' => 'form-signin')) }}
-								{{ Form::text('first_name', $member->first_name, array(
+								{{ Form::text('first_name', $user->first_name, array(
 												'class' => 'form-control',
 												'placeholder' => 'First name',
 									)) }}
-								{{ Form::text('last_name', $member->last_name, array(
+								{{ Form::text('last_name', $user->last_name, array(
 												'class' => 'form-control',
 												'placeholder' => 'Last name',
 									)) }}
-								{{ Form::text('email', $member->email, array(
+								{{ Form::text('email', $user->email, array(
 												'class' => 'form-control',
 												'placeholder' => 'Email',
 									)) }}
 								{{ Form::hidden('team_id', isset($team) ? $team->id : '') }}
-								{{ Form::hidden('user_id', $member->id) }}
+								{{ Form::hidden('user_id', $user->id) }}
 								{{ Form::submit('Save', array('class' => 'btn btn-primary btn-block')) }}
 							{{ Form::close() }}
 						@endif
