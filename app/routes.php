@@ -65,6 +65,12 @@ Route::get('/', function() {
 	}
 });
 
+Route::get('/tournaments/{id}', function($tournamentId) {
+
+	$tournament = Tournament::find($tournamentId);
+	return View::make('index')->with('tournament', $tournament);
+});
+
 Route::get('login', function() {
 
 	if (Auth::check()) {
@@ -202,10 +208,18 @@ Route::post('register', function() {
 		
 		// Create the charge on Stripe's servers - this will charge the user's card
 		try {
+			$customer = Stripe_Customer::create(array(
+				"card" => $stripeToken,
+				"email" => $email,
+				"description" => $userParams['first_name'] . ' ' .
+					$userParams['last_name']
+			));
+			
+			// Charge the Customer instead of the card
 			$charge = Stripe_Charge::create(array(
 				"amount" => $amount,
 				"currency" => "usd",
-				"card" => $stripeToken,
+				"customer" => $customer->id,
 				"description" => $description
 			));
 		} 
@@ -227,7 +241,7 @@ Route::post('register', function() {
 		]);
 		
 		// save user's stripe info
-		$user->stripe_id = $charge->id;
+		$user->stripe_id = $customer->id;
 		$user->save();
 		
 		// associate with division and tournament
