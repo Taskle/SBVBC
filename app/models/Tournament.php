@@ -25,5 +25,14 @@ class Tournament extends Eloquent {
 	public function teams() {
 		return $this->belongsToMany('Team');
 	}
+	
+	/** 
+	 * Gets the next upcoming tournament based on date
+	 */
+	public static function getUpcoming() {		
+		return Tournament::where('date', '>', time())->get()->sortBy(function($t) {
+			return $t->date;
+		})->first();
+	}
 
 }

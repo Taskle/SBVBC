@@ -22,7 +22,7 @@ Route::get('/', function() {
 		);
 		
 		if (Auth::user()->role == 'Admin') {
-			$context['tournaments'] = Tournament::all();
+			$context['tournament'] = Tournament::getUpcoming();
 			
 			// look up payment status for every user
 			Stripe::setApiKey(Config::get('app.stripe.api_key'));
@@ -60,7 +60,7 @@ Route::get('/', function() {
 	} else {
 
 		// get most recent tournament in database
-		$tournament = Tournament::find(1);
+		$tournament = Tournament::getUpcoming();
 		return View::make('index')->with('tournament', $tournament);
 	}
 });
