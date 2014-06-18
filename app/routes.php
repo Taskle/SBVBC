@@ -209,10 +209,17 @@ Route::post('register', function() {
 	Stripe::setApiKey(Config::get('app.stripe.api_key'));
 
 	$stripeToken = Input::get('stripeToken');
-	$description = $email . ' - ' . 
-			$tournament->name . ' - ' . $division->name;
+	$description = $email;
+	
+	// add tournament and division to stripe description if they're set
+	if ($tournament && isset($tournament->name)) {
+		$description .= ' - ' . $tournament->name;
+	}
+	if ($division && isset($division->name)) {
+		$description .= ' - ' . $division->name;
+	}
 
-			// get price in cents for sending to stripe
+	// get price in cents for sending to stripe
 	$amount = $type == 'team' ?  ($division->team_price * 100) :
 			($division->solo_price * 100);
 
@@ -320,6 +327,17 @@ Route::post('register', function() {
 		$message->to($email, $user->getFullName())->subject($subject);
 	});
 
+	// add tournament and division to stripe description if they're set
+	$output = 'You are now registered';
+	if ($tournament && isset($tournament->name)) {
+		$output .= ' for ' . $tournament->name;
+	}
+	if ($division && isset($division->name)) {
+		$output .= ' (' . $division->name . ')';
+	}
+	$output .= '!';
+	
+	Session::flash('success', $output);
 	return Redirect::to('/');
 });
 
