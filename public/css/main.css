@@ -39,6 +39,10 @@ form input[type="submit"] {
 	font-weight: bold;
 }
 
+.deemphasis {
+	color: #aaa;
+}
+
 .placeholder {
 	color:#666
 }

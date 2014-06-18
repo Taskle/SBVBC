@@ -11,12 +11,6 @@
   |
  */
 
-// temp code to show DB password since it's not showing in AWS
-Route::get('/foobartest', function() {
-	echo ' - A: ' . Config::get('app.connections.mysql.password');
-	echo ' - B: ' . $_SERVER['RDS_PASSWORD'];
-});
-
 Route::get('/', function() {
 
 	if (Auth::check()) { // && Auth::user()->role != 'Admin') {

@@ -33,6 +33,10 @@
 	cursor: pointer; /* hack to fix iPhone not registering click */
 }
 
+.title-detail {
+	margin-left: 10px;
+}
+
 </style>
 @stop
 
@@ -63,13 +67,13 @@ $(function() {
 @section('content')
 
 @if (Auth::user()->role == 'Admin')
-	<h3>{{ $tournament->name }}</h3>
+	<h3>{{ $tournament->name }} <span class="title-detail deemphasis">{{ count($tournament->users) }} players</span></h3>
 	@foreach ($tournament->divisions()->get() as $division)
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h3 class="panel-title">
 					<a href="/admin/divisions/{{ $division->id }}">
-						{{ $division->name }}
+						{{ $division->name }} <span class="title-detail deemphasis">{{ count($division->users) }} players</span>
 					</a>
 				</h3>
 			</div>
@@ -209,7 +213,7 @@ $(function() {
 	@foreach ($myTeams as $team)
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h3 class="panel-title">{{ $team->name }}</h3>
+				<h3 class="panel-title">{{ $team->name }} <span class="title-detail deemphasis">{{ count($team->users) }} players</span></h3>
 			</div>
 			<div class="panel-body">
 				<h4>Members:</h4>
