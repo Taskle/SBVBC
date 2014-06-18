@@ -71,7 +71,7 @@
 }
 @else
 	
-Registration for <?= $tournament->name ?> is now closed. If you would still like to participate, please email <a href="mailto:jim@sbvbc.org">jim (at) sbvbc.org</a> with the division you wish to join and we will see if it's possible to accomodate you.
+Registration for <?= $tournament->name ?> is now closed. If you would still like to participate, please email <a href="mailto:contact@sbvbc.org">contact@sbvbc.org</a> with the division you wish to join and we will see if it's possible to accomodate you.
 
 @endif
 
