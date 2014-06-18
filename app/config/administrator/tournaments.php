@@ -18,19 +18,20 @@ return array(
 			'title' => 'Name',
 			'sort_field' => 'name',
 		),
+		'date' => array(
+			'title' => 'Date/Time',
+		),
+		'registration_deadline' => array(
+			'title' => 'Registration Deadline',
+		),
 		'num_members' => array(
-			'title' => '# participants',
+			'title' => 'Participants',
 			'relationship' => 'users',
 			'select' => 'COUNT((:table).id)',
 		),
 		'num_teams' => array(
-			'title' => '# teams',
+			'title' => 'Teams',
 			'relationship' => 'teams',
-			'select' => 'COUNT((:table).id)',
-		),
-		'num_members' => array(
-			'title' => '# divisions',
-			'relationship' => 'divisions',
 			'select' => 'COUNT((:table).id)',
 		),
 	),
@@ -46,6 +47,9 @@ return array(
 		'date' => array(
 			'title' => 'Date/Time',
 		),
+		'registration_deadline' => array(
+			'title' => 'Registration Deadline',
+		),
 	),
 
 	/**
@@ -58,6 +62,10 @@ return array(
 		),
 		'date' => array(
 			'title' => 'Date/Time',
+			'type' => 'datetime',
+		),
+		'registration_deadline' => array(
+			'title' => 'Registration Deadline',
 			'type' => 'datetime',
 		),
 		'description' => array(

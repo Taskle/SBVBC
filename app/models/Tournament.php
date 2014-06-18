@@ -35,4 +35,19 @@ class Tournament extends Eloquent {
 		})->first();
 	}
 
+	/**
+	 * Checks deadline datetime and returns true or false depending on if
+	 * registration is open or not
+	 */
+	public function isRegistrationOpen() {
+		if ($this->registration_deadline) {
+
+			// if current time is before deadline, return true, else aflse
+			return (date('Y-m-d H:i:s') < $this->registration_deadline);
+		}
+		else {
+			// no deadline means registration is always open
+			return true;
+		}
+	}
 }
