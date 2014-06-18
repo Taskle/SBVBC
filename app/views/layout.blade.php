@@ -52,10 +52,6 @@
 	@section('jumbotron')
 	@show
 	<div class="main container">
-		<h1>
-		@section('title')
-		@show
-		</h1>
 		@if(Session::has('success'))
 			<div class="alert alert-success">{{ Session::get('success') }}</div>
 		@endif
@@ -70,6 +66,10 @@
 				<div class="alert alert-danger">{{ $error }}</div>
 			@endforeach
 		@endif
+		<h1>
+		@section('title')
+		@show
+		</h1>
 		@yield('content')
 	</div>
 	<script>
