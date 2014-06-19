@@ -60,6 +60,11 @@ return array(
 			'type' => 'relationship',
 			'name_field' => 'name',
 		),
+		'teams' => array(
+			'title' => 'Teams',
+			'type' => 'relationship',
+			'name_field' => 'name',
+		),
 		'ratings_allowed' => array(
 			'title' => 'Ratings allowed (comma-separated)',
 			'type' => 'text',

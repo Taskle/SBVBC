@@ -39,7 +39,6 @@
 @section('content')
 
 @if ($tournament->isRegistrationOpen())
-
 	@foreach ($tournament->divisions()->get() as $division)
 		<div class="volleyball-division col-md-4">
 			<div class="panel panel-default">
@@ -68,7 +67,6 @@
 			</div>
 		</div>
 	@endforeach
-}
 @else
 	
 Registration for <?= $tournament->name ?> is now closed. If you would still like to participate, please email <a href="mailto:contact@sbvbc.org">contact@sbvbc.org</a> with the division you wish to join and we will see if it's possible to accomodate you.
