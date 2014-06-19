@@ -104,7 +104,7 @@ Request::setTrustedProxies(array(
  */
 App::error(function(Exception $exception, $code) {
 	
-	Log::error($exception);
+	Log::error($exception . '<br><br>' . $exception->getTraceAsString());
 	
 	// ignore 404s
 	if ($code == 404) {
@@ -120,4 +120,3 @@ App::error(function(Exception $exception, $code) {
 		return Response::view('errors.500', array(), 500);
 	}
 });
-

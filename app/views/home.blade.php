@@ -70,135 +70,138 @@ $(function() {
 
 @section('content')
 
-<a class="btn btn-primary btn-export-players" href="/export-tournament-csv/<?= $tournament->id ?>">Export to Excel</a>
-
 @if (Auth::user()->role == 'Admin')
-	<h3>{{ $tournament->name }} <span class="title-detail deemphasis">{{ count($tournament->teams) }} teams, {{ count($tournament->users) }} players</span></h3>
-	@foreach ($tournament->divisions()->get() as $division)
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h3 class="panel-title">
-					<a href="/admin/divisions/{{ $division->id }}">
-						{{ $division->name }} <span class="title-detail deemphasis">{{ count($division->teams) }} teams, {{ count($division->users) }} players</span>
-					</a>
-				</h3>
-			</div>
-			<div class="panel-body">
-				<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
-					<li class="active"><a href="#team-{{ $tournament->id }}-{{ $division->id }}" data-toggle="tab">By Team</a></li>
-					<li><a href="#people-{{ $tournament->id }}-{{ $division->id }}" data-toggle="tab">By Person</a></li>
-				</ul>
-				<div id="my-tab-content" class="tab-content">
-					<div class="tab-pane active" id="team-{{ $tournament->id }}-{{ $division->id }}">
-						<table class="table table-striped table-bordered table-condensed">
-						<thead
-							<tr>
-							   <th>Team</th>
-							   <th>Name</th>
-							   <th>Email</th>
-							   <th>Rating</th>
-							   <th>Payment</th>
-							</tr>
-						</thead>
-						<tbody>
-						@foreach ($division->getUnassignedPlayers($tournament->id) as $user)
-							<tr>
-								<td></td>
-								<td><a href="/admin/users/{{ $user->id }}">
-									{{ $user->full_name }}
-								</a></td>
-								<td><a href="mailto:{{ $user->email }}">
-									{{ $user->email }}
-								</a></td>
-								<td><a href="/admin/users/{{ $user->id }}">
-									{{ $user->rating }}
-								</a></td>
-								<td>
-									@if (isset($paymentStatus[$user->email]))
-										Paid ${{ $paymentStatus[$user->email] }}
-									@endif
-								</td>
-							</tr>
-						@endforeach
-						@foreach ($division->teams->sortBy(function($team) {
-							return $team->name;
-						}) as $team)
-							@foreach ($team->users()->get() as $user)
-								<tr>
-									<td><a href="/admin/teams/{{ $team->id }}">
-											{{ $team->name }}</a>
-									</td>
-									<td><a href="/admin/users/{{ $user->id }}">
-										{{ $user->full_name }}
-									</a></td>
-									<td><a href="mailto:{{ $user->email }}">
-										{{ $user->email }}
-									</a></td>
-									<td><a href="/admin/users/{{ $user->id }}">
-										{{ $user->rating }}
-									</a></td>
-									<td>
-										@if (isset($paymentStatus[$user->email]))
-											Paid ${{ $paymentStatus[$user->email] }}
-										@endif
-									</td>
-								</tr>
-							@endforeach
-						@endforeach
-						</tbody>
-						</table>
-					</div>
-					<div class="tab-pane" id="people-{{ $tournament->id }}-{{ $division->id }}">
-						<table class="table table-striped table-bordered table-condensed">
-						<thead
-							<tr>
-							   <th>First Name</th>
-							   <th>Last Name</th>
-							   <th>Email</th>
-							   <th>Rating</th>
-							   <th>Payment</th>
-							   <th>Team</th>
-							</tr>
-						</thead>
-						<tbody>
-						@foreach ($division->users->sortBy(function($user) {
-							return $user->full_name;
-						}) as $user)
-							<tr>
-								<td><a href="/admin/users/{{ $user->id }}">
-									{{ $user->first_name }}
-								</a></td>
-								<td><a href="/admin/users/{{ $user->id }}">
-									{{ $user->last_name }}
-								</a></td>
-								<td><a href="mailto:{{ $user->email }}">
-									{{ $user->email }}
-								</a></td>
-								<td><a href="/admin/users/{{ $user->id }}">
-									{{ $user->rating }}
-								</a></td>
-								<td>
-									@if (isset($paymentStatus[$user->email]))
-										Paid ${{ $paymentStatus[$user->email] }}
-									@endif
-								</td>
-								<td>
-									<?php $team = $user->getTeam($tournament->id);
-									if (isset($team) && $team) { ?>
-										<a href="/admin/teams/{{ $team->id }}">
-											{{ $team->name }}</a>
-									<?php } ?>
-								</td>
-							</tr>
-						@endforeach
-						</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-		</div>
-	@endforeach
 
+	@if (isset($tournament))
+            <a class="btn btn-primary btn-export-players" href="/export-tournament-csv/<?= $tournament->id ?>">Export to Excel</a>
+
+            <h3>{{ $tournament->name }} <span class="title-detail deemphasis">{{ count($tournament->teams) }} teams, {{ count($tournament->users) }} players</span></h3>
+            @foreach ($tournament->divisions()->get() as $division)
+                    <div class="panel panel-default">
+                            <div class="panel-heading">
+                                    <h3 class="panel-title">
+                                            <a href="/admin/divisions/{{ $division->id }}">
+                                                    {{ $division->name }} <span class="title-detail deemphasis">{{ count($division->teams) }} teams, {{ count($division->users) }} players</span>
+                                            </a>
+                                    </h3>
+                            </div>
+                            <div class="panel-body">
+                                    <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+                                            <li class="active"><a href="#team-{{ $tournament->id }}-{{ $division->id }}" data-toggle="tab">By Team</a></li>
+                                            <li><a href="#people-{{ $tournament->id }}-{{ $division->id }}" data-toggle="tab">By Person</a></li>
+                                    </ul>
+                                    <div id="my-tab-content" class="tab-content">
+                                            <div class="tab-pane active" id="team-{{ $tournament->id }}-{{ $division->id }}">
+                                                    <table class="table table-striped table-bordered table-condensed">
+                                                    <thead
+                                                            <tr>
+                                                               <th>Team</th>
+                                                               <th>Name</th>
+                                                               <th>Email</th>
+                                                               <th>Rating</th>
+                                                               <th>Payment</th>
+                                                            </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    @foreach ($division->getUnassignedPlayers($tournament->id) as $user)
+                                                            <tr>
+                                                                    <td></td>
+                                                                    <td><a href="/admin/users/{{ $user->id }}">
+                                                                            {{ $user->full_name }}
+                                                                    </a></td>
+                                                                    <td><a href="mailto:{{ $user->email }}">
+                                                                            {{ $user->email }}
+                                                                    </a></td>
+                                                                    <td><a href="/admin/users/{{ $user->id }}">
+                                                                            {{ $user->rating }}
+                                                                    </a></td>
+                                                                    <td>
+                                                                            @if (isset($paymentStatus[$user->email]))
+                                                                                    Paid ${{ $paymentStatus[$user->email] }}
+                                                                            @endif
+                                                                    </td>
+                                                            </tr>
+                                                    @endforeach
+                                                    @foreach ($division->teams->sortBy(function($team) {
+                                                            return $team->name;
+                                                    }) as $team)
+                                                            @foreach ($team->users()->get() as $user)
+                                                                    <tr>
+                                                                            <td><a href="/admin/teams/{{ $team->id }}">
+                                                                                            {{ $team->name }}</a>
+                                                                            </td>
+                                                                            <td><a href="/admin/users/{{ $user->id }}">
+                                                                                    {{ $user->full_name }}
+                                                                            </a></td>
+                                                                            <td><a href="mailto:{{ $user->email }}">
+                                                                                    {{ $user->email }}
+                                                                            </a></td>
+                                                                            <td><a href="/admin/users/{{ $user->id }}">
+                                                                                    {{ $user->rating }}
+                                                                            </a></td>
+                                                                            <td>
+                                                                                    @if (isset($paymentStatus[$user->email]))
+                                                                                            Paid ${{ $paymentStatus[$user->email] }}
+                                                                                    @endif
+                                                                            </td>
+                                                                    </tr>
+                                                            @endforeach
+                                                    @endforeach
+                                                    </tbody>
+                                                    </table>
+                                            </div>
+                                            <div class="tab-pane" id="people-{{ $tournament->id }}-{{ $division->id }}">
+                                                    <table class="table table-striped table-bordered table-condensed">
+                                                    <thead
+                                                            <tr>
+                                                               <th>First Name</th>
+                                                               <th>Last Name</th>
+                                                               <th>Email</th>
+                                                               <th>Rating</th>
+                                                               <th>Payment</th>
+                                                               <th>Team</th>
+                                                            </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    @foreach ($division->users->sortBy(function($user) {
+                                                            return $user->full_name;
+                                                    }) as $user)
+                                                            <tr>
+                                                                    <td><a href="/admin/users/{{ $user->id }}">
+                                                                            {{ $user->first_name }}
+                                                                    </a></td>
+                                                                    <td><a href="/admin/users/{{ $user->id }}">
+                                                                            {{ $user->last_name }}
+                                                                    </a></td>
+                                                                    <td><a href="mailto:{{ $user->email }}">
+                                                                            {{ $user->email }}
+                                                                    </a></td>
+                                                                    <td><a href="/admin/users/{{ $user->id }}">
+                                                                            {{ $user->rating }}
+                                                                    </a></td>
+                                                                    <td>
+                                                                            @if (isset($paymentStatus[$user->email]))
+                                                                                    Paid ${{ $paymentStatus[$user->email] }}
+                                                                            @endif
+                                                                    </td>
+                                                                    <td>
+                                                                            <?php $team = $user->getTeam($tournament->id);
+                                                                            if (isset($team) && $team) { ?>
+                                                                                    <a href="/admin/teams/{{ $team->id }}">
+                                                                                            {{ $team->name }}</a>
+                                                                            <?php } ?>
+                                                                    </td>
+                                                            </tr>
+                                                    @endforeach
+                                                    </tbody>
+                                                    </table>
+                                            </div>
+                                    </div>
+                            </div>
+                    </div>
+            @endforeach
+        @endif
+        
 	<h2>My Registration Details</h2>
 @endif
 
