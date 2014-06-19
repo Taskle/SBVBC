@@ -37,6 +37,10 @@
 	margin-left: 10px;
 }
 
+.btn-export-players {
+	float: right;
+}
+
 </style>
 @stop
 
@@ -65,6 +69,8 @@ $(function() {
 @stop
 
 @section('content')
+
+<a class="btn btn-primary btn-export-players" href="/export-tournament-csv/<?= $tournament->id ?>">Export to Excel</a>
 
 @if (Auth::user()->role == 'Admin')
 	<h3>{{ $tournament->name }} <span class="title-detail deemphasis">{{ count($tournament->teams) }} teams, {{ count($tournament->users) }} players</span></h3>

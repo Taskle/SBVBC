@@ -60,6 +60,62 @@ Route::get('/', function() {
 	}
 });
 
+function array2csv(array &$array)
+{
+   if (count($array) == 0) {
+     return null;
+   }
+   ob_start();
+   $df = fopen("php://output", 'w');
+   foreach ($array as $row) {
+      fputcsv($df, $row);
+   }
+   fclose($df);
+   return ob_get_clean();
+}
+
+function download_send_headers($filename) {
+    // disable caching
+    $now = gmdate("D, d M Y H:i:s");
+    header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");
+    header("Cache-Control: max-age=0, no-cache, must-revalidate, proxy-revalidate");
+    header("Last-Modified: {$now} GMT");
+
+    // force download  
+    header("Content-Type: application/force-download");
+    header("Content-Type: application/octet-stream");
+    header("Content-Type: application/download");
+
+    // disposition / encoding on response body
+    header("Content-Disposition: attachment;filename={$filename}");
+    header("Content-Transfer-Encoding: binary");
+}
+
+Route::get('/export-tournament-csv/{id}', function($tournamentId) {
+	
+	if (!Auth::check() || Auth::user()->role != 'Admin') {
+		return Redirect::to('/');
+	}
+	
+	$tournament = Tournament::find($tournamentId);
+
+	$data = [['First name', 'Last name', 'Email', 'Rating', 'Team', 
+				'Signature']];
+	
+	foreach ($tournament->users->sortBy('full_name') as $user) {
+
+		$team = $user->getTeam($tournament->id);
+		$user = [$user->first_name, $user->last_name, $user->email,
+			$user->rating];
+		$user[] = $team ? $team->name : '';
+		$data[] = $user;
+	}
+	
+	download_send_headers("data_export_" . date("Y-m-d") . ".csv");
+	echo array2csv($data);
+	die();
+});
+
 Route::get('/tournaments/{id}', function($tournamentId) {
 
 	$tournament = Tournament::find($tournamentId);
