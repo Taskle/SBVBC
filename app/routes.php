@@ -29,23 +29,18 @@ Route::get('/', function() {
 			$context['paymentStatus'] = array();
 			$users = User::all();
 			
-			$charges = Stripe_Charge::all(array('limit' => 1000));
+			$charges = Stripe_Charge::all(array('limit' => 100));
 			
 			$numCharges = count($charges->data);
 			for ($i = 0; $i < $numCharges; $i++) {
 
 				$charge = $charges->data[$i];
 				
-				if ($charge->card->name) {
+				if ($charge->card->paid && $charge->card->name) {
 					
 					// get total minus refund
-					$amount = $charge->amount;
-					if ($charge->refunds) {
-						foreach ($charge->refunds as $refund) {
-							$amount -= $refund->amount;
-						}
-					}
-					
+					$amount = $charge->amount - $charge->amount_refunded;
+										
 					if (!isset($context['paymentStatus'][$charge->card->name])) {
 						$context['paymentStatus'][$charge->card->name] = 0;
 					}
@@ -250,15 +245,17 @@ Route::post('register', function() {
 			"customer" => $customer->id,
 			"description" => $description
 		));
-	} 
-	catch (Stripe_CardError $e) {
+	}
+	catch (Stripe_Error $e) {
 
 		$e_json = $e->getJsonBody();
 		$error = $e_json['error'];
+		
 		// The card has been declined
-		// redirect back to checkout page
-		return Redirect::to('/register')
-			->withInput()->with('stripe_errors', $error['message']);
+		// redirect back to checkout page		
+		Session::flash('error', $error['message']);
+		
+		return Redirect::to(URL::full())->withInput();
 	}
 
 	// create and log in user if not logged in
