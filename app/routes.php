@@ -36,7 +36,7 @@ Route::get('/', function() {
 
 				$charge = $charges->data[$i];
 				
-				if ($charge->card->paid && $charge->card->name) {
+				if ($charge->paid && $charge->card->name) {
 					
 					// get total minus refund
 					$amount = $charge->amount - $charge->amount_refunded;
