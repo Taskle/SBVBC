@@ -11,6 +11,37 @@
   |
  */
 
+function getPaymentsByEmail() {
+	
+	// look up payment status for every user
+	Stripe::setApiKey(Config::get('app.stripe.api_key'));
+	$payments = array();
+	$users = User::all();
+
+	$charges = Stripe_Charge::all(array('limit' => 100));
+
+	$numCharges = count($charges->data);
+	for ($i = 0; $i < $numCharges; $i++) {
+
+		$charge = $charges->data[$i];
+
+		if ($charge->paid && $charge->card->name) {
+
+			// get total minus refund
+			$amount = $charge->amount - $charge->amount_refunded;
+
+			if (!isset($payments[$charge->card->name])) {
+				$payments[$charge->card->name] = 0;
+			}
+
+			$payments[$charge->card->name] += 
+					($amount / 100.0);
+		}
+	}
+	
+	return $payments;
+}
+
 Route::get('/', function() {
 
 	if (Auth::check()) { // && Auth::user()->role != 'Admin') {
@@ -23,32 +54,7 @@ Route::get('/', function() {
 		
 		if (Auth::user()->role == 'Admin') {
 			$context['tournament'] = Tournament::getUpcoming();
-			
-			// look up payment status for every user
-			Stripe::setApiKey(Config::get('app.stripe.api_key'));
-			$context['paymentStatus'] = array();
-			$users = User::all();
-			
-			$charges = Stripe_Charge::all(array('limit' => 100));
-			
-			$numCharges = count($charges->data);
-			for ($i = 0; $i < $numCharges; $i++) {
-
-				$charge = $charges->data[$i];
-				
-				if ($charge->paid && $charge->card->name) {
-					
-					// get total minus refund
-					$amount = $charge->amount - $charge->amount_refunded;
-										
-					if (!isset($context['paymentStatus'][$charge->card->name])) {
-						$context['paymentStatus'][$charge->card->name] = 0;
-					}
-					
-					$context['paymentStatus'][$charge->card->name] += 
-							($amount / 100.0);
-				}
-			}
+			$context['paymentStatus'] = getPaymentsByEmail();
 		}
 		
 		return View::make('home')->with($context);
@@ -100,18 +106,25 @@ Route::get('/export-tournament-csv/{id}', function($tournamentId) {
 	$tournament = Tournament::find($tournamentId);
 
 	$data = [['First name', 'Last name', 'Email', 'Rating', 'Team', 
-				'Signature']];
+		'Paid', 'Signature']];
+	
+	$paymentStatus = getPaymentsByEmail();
 	
 	foreach ($tournament->users->sortBy('full_name') as $user) {
 
 		$team = $user->getTeam($tournament->id);
-		$user = [$user->first_name, $user->last_name, $user->email,
+		$userArray = [$user->first_name, $user->last_name, $user->email,
 			$user->rating];
-		$user[] = $team ? $team->name : '';
-		$data[] = $user;
+		$userArray[] = $team ? $team->name : '';
+		
+		$userArray[] = array_key_exists($user->email, $paymentStatus) ? 
+					'$' . $paymentStatus[$user->email] : '';
+		
+		$data[] = $userArray;
 	}
 	
-	download_send_headers("data_export_" . date("Y-m-d") . ".csv");
+	download_send_headers(str_replace(' ', '-', $tournament->name) . '-' . 
+			date("Y-m-d") . ".csv");
 	echo array2csv($data);
 	die();
 });
