@@ -70,6 +70,10 @@ $(function() {
 
 @section('content')
 
+@if ($tournament->schedule_url)
+	<p><a target="_blank" href="{{ $tournament->schedule_url }}">View the tournament schedule</a></p>
+@endif
+
 @if (Auth::user()->role == 'Admin')
 
 	@if (isset($tournament))
