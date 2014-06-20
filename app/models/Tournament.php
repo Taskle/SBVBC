@@ -6,6 +6,50 @@ class Tournament extends Eloquent {
 	protected $guarded = array('id');
 
 	/**
+	 * If filename is there, it was just uploaded to temp,
+	 * so upload it to S3, the update the name
+	 */
+	public function save(array $options = array()) {
+			
+		if ($this->isDirty('schedule_url') && $this->schedule_url) {
+			
+			$localUri = sys_get_temp_dir() . '/' . $this->schedule_url;
+			$newUrl = 'tournaments/' . $this->id . '/' . 
+					$this->schedule_url;
+
+			try {
+
+				if (!$this->id) {
+
+					// try saving to get id
+					if (!parent::save($options)) {
+						return false;
+					}
+				}
+
+				// upload to S3
+				$s3 = AWS::get('s3');
+				$s3->putObject(array(
+					'Bucket'     => Config::get('app.s3_bucket'),
+					'Key'        => $newUrl,
+					'SourceFile' => $localUri,
+				));
+
+			} catch (S3Exception $e) {
+
+				$this->setErrors($e->getMessage());
+				return false;
+			}
+
+			// set url to S3 url
+			$this->schedule_url = $s3->getObjectUrl(
+					Config::get('app.s3_bucket'), $newUrl);
+		}
+		
+		parent::save($options);
+	}
+	
+	/**
 	 * Get the unique identifier for the user.
 	 *
 	 * @return mixed

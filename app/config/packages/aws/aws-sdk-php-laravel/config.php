@@ -32,7 +32,7 @@ return array(
     */
     'key'    => $_SERVER['AWS_ACCESS_KEY_ID'], // Your AWS Access Key ID
     'secret' => $_SERVER['AWS_SECRET_KEY'], // Your AWS Secret Access Key
-
+	
     /*
     |--------------------------------------------------------------------------
     | AWS Region

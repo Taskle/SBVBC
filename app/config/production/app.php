@@ -2,5 +2,6 @@
 
 return array(
 	'debug' => false,
-	'ssl' => true
+	'ssl' => true,
+	's3_bucket' => 'sbvbc'
 );

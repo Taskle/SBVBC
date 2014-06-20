@@ -74,6 +74,14 @@ return array(
 			'limit' => 4096,
 			'height' => 350
 		),
+		'schedule_url' => array(
+			'title' => 'Schedule',
+			'type' => 'file',
+			'location' => sys_get_temp_dir() . '/',
+			'naming' => 'keep',
+			'length' => 127,
+			'size_limit' => 2,
+		),
 	),
 
 );

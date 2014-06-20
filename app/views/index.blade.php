@@ -30,6 +30,9 @@
 			<h1>{{ $tournament->name }}</h1>
 			<h2>{{ (new DateTime($tournament->date))->format('n/d') }} Open Grass Tournament</h2>
 			<p>{{ $tournament->description }}</p>
+			@if ($tournament->schedule_url)
+				<p><a target="_blank" href="{{ $tournament->schedule_url }}">View the tournament schedule</a></p>
+			@endif
 		</div>
 	</div>
 </div>
