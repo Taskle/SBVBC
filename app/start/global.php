@@ -104,7 +104,10 @@ Request::setTrustedProxies(array(
  */
 App::error(function(Exception $exception, $code) {
 	
-	Log::error($exception . '<br><br>' . $exception->getTraceAsString());
+	$message = 'Url: ' . Request::fullUrl() .
+                '<br><br>Input: ' . json_encode(Input::all()) .
+                '<br><br>' . $exception . 
+                '<br><br>' . $exception->getTraceAsString();
 	
 	// ignore 404s
 	if ($code == 404) {
@@ -112,7 +115,7 @@ App::error(function(Exception $exception, $code) {
 	}
 	
 	if (Config::getEnvironment() == 'production') {
-		$data = array('exception' => $exception);
+		$data = array('exception' => $message);
 		Mail::send('emails.error', $data, function($message) {
 			$message->to(Config::get('app.error_email'))->subject('SBVBC Website Error');
 		});
