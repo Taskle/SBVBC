@@ -24,16 +24,6 @@ return array(
 		'registration_deadline' => array(
 			'title' => 'Registration Deadline',
 		),
-		'num_members' => array(
-			'title' => 'Participants',
-			'relationship' => 'users',
-			'select' => 'COUNT((:table).id)',
-		),
-		'num_teams' => array(
-			'title' => 'Teams',
-			'relationship' => 'teams',
-			'select' => 'COUNT((:table).id)',
-		),
 	),
 
 	/**

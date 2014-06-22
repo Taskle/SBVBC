@@ -87,13 +87,20 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	 */
 	public function getTeam($tournamentId) {
 		return $this->teams->filter(function($team) use ($tournamentId) {
-			foreach ($team->tournaments as $tournament) {
-				if ($tournamentId == $tournament->id) {
-					return true;
-				}
-			}
-			return false;
+			return ($team->division->tournament->id == $tournamentId);
 		})->first();
+	}
+	
+	/**
+	 * Gets team user is on for the given tournament
+	 */
+	public function getDivision($tournamentId) {
+
+		return Division::join('division_user', 'division_id', '=', 
+				'divisions.id')
+			->where('division_user.user_id', '=', $this->id)
+			->where('divisions.tournament_id', '=', $tournamentId)
+			->first();
 	}
 
 	/**
@@ -106,15 +113,11 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	}
 
 	public function divisions() {
-		return $this->belongsToMany('Division');
+		return $this->belongsToMany('Division')->withTimestamps();
 	}
 
 	public function teams() {
-		return $this->belongsToMany('Team');
+		return $this->belongsToMany('Team')->withTimestamps();
 	}
-
-	public function tournaments() {
-		return $this->belongsToMany('Tournament');
-	}
-
+	
 }

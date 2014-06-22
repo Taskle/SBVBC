@@ -18,6 +18,12 @@ return array(
 			'title' => 'Name',
 			'sort_field' => 'name',
 		),
+		'division' => array(
+			'type' => 'relationship',
+			'title' => 'Division',
+			'relationship' => 'division',
+			'select' => '(:table).name',
+		),
 		'num_members' => array(
 			'title' => '# members',
 			'relationship' => 'users',
@@ -33,21 +39,16 @@ return array(
 		'name' => array(
 			'title' => 'Name',
 		),
-		'divisions' => array(
-			'title' => 'Divisions',
-			'type' => 'relationship',
-			'name_field' => 'name',
-		),
-		'tournaments' => array(
-			'title' => 'Tournaments',
-			'type' => 'relationship',
-			'name_field' => 'name',
-		),
 		'users' => array(
 			'title' => 'Members',
 			'type' => 'relationship',
 			'name_field' => 'full_name',
 			'options_sort_field' => "CONCAT(first_name, ' ' , last_name)",
+		),
+		'division' => array(
+			'title' => 'Division',
+			'type' => 'relationship',
+			'name_field' => 'long_name',
 		),
 	),
 
@@ -59,15 +60,10 @@ return array(
 			'title' => 'Name',
 			'type' => 'text',
 		),
-		'divisions' => array(
-			'title' => 'Divisions',
+		'division' => array(
+			'title' => 'Division',
 			'type' => 'relationship',
-			'name_field' => 'name',
-		),
-		'tournaments' => array(
-			'title' => 'Tournaments',
-			'type' => 'relationship',
-			'name_field' => 'name',
+			'name_field' => 'long_name',
 		),
 		'users' => array(
 			'title' => 'Members',

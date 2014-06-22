@@ -26,14 +26,9 @@ return array(
 			'title' => 'Rating',
 			'sort_field' => 'rating',
 		),
-		'num_teams' => array(
-			'title' => '# teams',
-			'relationship' => 'teams',
-			'select' => 'COUNT((:table).id)',
-		),
-		'num_tournaments' => array(
-			'title' => '# tourneys',
-			'relationship' => 'tournaments',
+		'num_divisions' => array(
+			'title' => '# Tourneys',
+			'relationship' => 'divisions',
 			'select' => 'COUNT((:table).id)',
 		),
 	),
@@ -63,12 +58,7 @@ return array(
 		'divisions' => array(
 			'title' => 'Divisions',
 			'type' => 'relationship',
-			'name_field' => 'name',
-		),
-		'tournaments' => array(
-			'title' => 'Tournaments',
-			'type' => 'relationship',
-			'name_field' => 'name',
+			'name_field' => 'long_name',
 		),
 	),
 
@@ -101,12 +91,7 @@ return array(
 		'divisions' => array(
 			'title' => 'Divisions',
 			'type' => 'relationship',
-			'name_field' => 'name',
-		),
-		'tournaments' => array(
-			'title' => 'Tournaments',
-			'type' => 'relationship',
-			'name_field' => 'name',
+			'name_field' => 'long_name',
 		),
 		'role' => array(
 			'title' => 'Website Role',

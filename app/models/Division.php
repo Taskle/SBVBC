@@ -6,12 +6,12 @@ class Division extends Eloquent {
 	protected $guarded = array('id');
 
 	private function prettyFormatDollarAmount($amt) {
-			if (($amt * 100) % 100 == 0) {
-				return number_format($amt, 0);
-			}
-			else {
-				return $amt;
-			}
+		if (($amt * 100) % 100 == 0) {
+			return number_format($amt, 0);
+		}
+		else {
+			return $amt;
+		}
 	}
 
 	/** accessor for using in admin views, etc.
@@ -19,7 +19,7 @@ class Division extends Eloquent {
 	 * @return string
 	 */
 	public function getFormattedSoloPriceAttribute() {
-                return $this->prettyFormatDollarAmount($this->solo_price);
+		return $this->prettyFormatDollarAmount($this->solo_price);
 	}
 
 	/** accessor for using in admin views, etc.
@@ -27,7 +27,7 @@ class Division extends Eloquent {
 	 * @return string
 	 */
 	public function getFormattedTeamPriceAttribute() {
-                return $this->prettyFormatDollarAmount($this->team_price);
+		return $this->prettyFormatDollarAmount($this->team_price);
 	}
 
 	/** accessor for using in admin views, etc.
@@ -35,22 +35,22 @@ class Division extends Eloquent {
 	 * @return string
 	 */
 	public function getFormattedAdditionalTeamMemberPriceAttribute() {
-                return $this->prettyFormatDollarAmount(
-                        $this->additional_team_member_price);
+		return $this->prettyFormatDollarAmount(
+				$this->additional_team_member_price);
+	}
+
+	public function getLongNameAttribute() {
+		return $this->tournament->name . ' ' .
+				$this->tournament->year . ' - ' . $this->name;
 	}
 	
 	/**
 	 * Returns all players without teams
 	 */
-	public function getUnassignedPlayers($tournamentId) {
-		return $this->users->filter(function($user) use ($tournamentId) {
-			return (count($user->teams->filter(function($team) use ($tournamentId) {
-				foreach ($team->tournaments as $tournament) {
-					if ($tournamentId == $tournament->id) {
-						return true;
-					}
-				}
-				return false;
+	public function getUnassignedPlayers() {
+		return $this->users->filter(function($user) {
+			return (count($user->teams->filter(function($team) {
+				return ($team->division_id == $this->id);				
 			})) == 0);
 		});
 	}
@@ -64,15 +64,15 @@ class Division extends Eloquent {
 		return $this->getKey();
 	}
 
+	public function tournament() {
+		return $this->belongsTo('Tournament');
+	}
+
 	public function users() {
-		return $this->belongsToMany('User');
+		return $this->belongsToMany('User')->withTimestamps();
 	}
 
 	public function teams() {
-		return $this->belongsToMany('Team');
-	}
-
-	public function tournaments() {
-		return $this->belongsToMany('Tournament');
+		return $this->hasMany('Team');
 	}
 }

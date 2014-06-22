@@ -44,16 +44,17 @@ function getPaymentsByEmail() {
 
 Route::get('/', function() {
 
+	$upcomingTournament = Tournament::getUpcoming();
+	
 	if (Auth::check()) { // && Auth::user()->role != 'Admin') {
 
 		$context = array(
-			'myTournaments' => Auth::user()->tournaments()->get(),
-			'myDivisions' => Auth::user()->divisions()->get(),
-			'myTeams' => Auth::user()->teams()->get(),
+			'tournament' => $upcomingTournament,
+			'myDivision' => Auth::user()->getDivision($upcomingTournament->id),
+			'myTeam' => Auth::user()->getTeam($upcomingTournament->id),
 		);
 		
 		if (Auth::user()->role == 'Admin') {
-			$context['tournament'] = Tournament::getUpcoming();
 			$context['paymentStatus'] = getPaymentsByEmail();
 		}
 		
@@ -61,8 +62,7 @@ Route::get('/', function() {
 	} else {
 
 		// get most recent tournament in database
-		$tournament = Tournament::getUpcoming();
-		return View::make('index')->with('tournament', $tournament);
+		return View::make('index')->with('tournament', $upcomingTournament);
 	}
 });
 
@@ -105,16 +105,19 @@ Route::get('/export-tournament-csv/{id}', function($tournamentId) {
 	
 	$tournament = Tournament::find($tournamentId);
 
-	$data = [['First name', 'Last name', 'Email', 'Rating', 'Team', 
+	$data = [['First name', 'Last name', 'Email', 'Rating', 'Division', 'Team', 
 		'Paid', 'Signature']];
 	
 	$paymentStatus = getPaymentsByEmail();
 	
-	foreach ($tournament->users->sortBy('full_name') as $user) {
+	foreach ($tournament->getUsers()->sortBy('full_name') as $user) {
 
+		$division = $user->getDivision($tournamentId);
+		$divisionName = $division ? $division->name : '';
+		
 		$team = $user->getTeam($tournament->id);
 		$userArray = [$user->first_name, $user->last_name, $user->email,
-			$user->rating];
+			$user->rating, $divisionName];
 		$userArray[] = $team ? $team->name : '';
 		
 		$userArray[] = array_key_exists($user->email, $paymentStatus) ? 
@@ -345,8 +348,7 @@ Route::post('register', function() {
 	$user->stripe_id = $customer->id;
 	$user->save();
 
-	// associate with division and tournament
-	$user->tournaments()->save($tournament);
+	// associate with division
 	$user->divisions()->save($division);
 
 	// if this is a group, create new team accordingly
@@ -354,11 +356,9 @@ Route::post('register', function() {
 
 		$teamName = Input::get('team_name');
 		$team = Team::create([
-			'name' => $teamName ? $teamName : $user->getFullName() . "'s team"
+			'name' => $teamName ? $teamName : $user->getFullName() . "'s team",
+			'division_id' => $division->id
 		]);
-
-		$team->tournaments()->save($tournament);
-		$team->divisions()->save($division);
 
 		// associate team to user
 		$user->teams()->save($team);
@@ -425,6 +425,7 @@ Route::post('update-teammate', function() {
 
 	// look up team
 	$team = Team::find($team_id);
+	$division = $team->division;
 	
 	if (!$team) {
 		return Redirect::to('/')->withErrors('Team ' . $team_id . ' not found');
@@ -489,16 +490,12 @@ Route::post('update-teammate', function() {
 			
 			$user->save();
 		
-			// associate with division, tournament, and team
-			foreach ($team->tournaments as $tournament) {
-				$user->tournaments()->save($tournament);
-			}
-			foreach ($team->divisions as $division) {
-				$user->divisions()->save($division);
-			}
+			// associate with division and team
+			$user->divisions()->save($division);
 			$user->teams()->save($team);
 		
 			$emailData = [];
+			$emailData['isNewUser'] = true;
 			$emailData['email'] = $email;
 			$emailData['password'] = $password;
 			$emailData['tournament'] = isset($tournament) ? 
@@ -521,6 +518,9 @@ Route::post('update-teammate', function() {
 				$message->from('contact@sbvbc.org', 'SBVBC');
 				$message->to($email, $user->getFullName())->subject($subject);
 			});
+			
+			Session::flash('success', 'You have added ' . 
+					$user->full_name . ' to your team! We have sent this person a confirmation email.');
 		}
 		else {
 			return Redirect::to('/')->withErrors($v->messages());

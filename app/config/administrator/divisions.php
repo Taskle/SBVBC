@@ -14,9 +14,9 @@ return array(
 	 */
 	'columns' => array(
 		'id',
-		'name' => array(
+		'long_name' => array(
 			'title' => 'Name',
-			'sort_field' => 'name',
+			'sort_field' => 'long_name',
 		),
 		'num_teams' => array(
 			'title' => '# teams',
@@ -42,7 +42,7 @@ return array(
 	 */
 	'filters' => array(
 		'id',
-		'name' => array(
+		'long_name' => array(
 			'title' => 'Name',
 		),
 	),
@@ -55,16 +55,18 @@ return array(
 			'title' => 'Name',
 			'type' => 'text',
 		),
-		'tournaments' => array(
-			'title' => 'Tournaments',
-			'type' => 'relationship',
+		'tournament' => array(
+		    'type' => 'relationship',
+			'title' => 'Tournament',
 			'name_field' => 'name',
 		),
-		'teams' => array(
-			'title' => 'Teams',
-			'type' => 'relationship',
-			'name_field' => 'name',
-		),
+//		'teams' => array(
+//			'title' => 'Teams',
+//			'type' => 'relationship',
+//			'name_field' => 'name',
+//			'sort_field' => 'name',
+//			'options_sort_field' => 'name',
+//		),
 		'ratings_allowed' => array(
 			'title' => 'Ratings allowed (comma-separated)',
 			'type' => 'text',

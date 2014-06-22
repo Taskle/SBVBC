@@ -5,6 +5,10 @@ class Tournament extends Eloquent {
 	protected $table = 'tournaments';
 	protected $guarded = array('id');
 
+	public function getYearAttribute() {
+		return $this->date ? substr($this->date, 0, 4) : date('Y');
+	}
+	
 	/**
 	 * If filename is there, it was just uploaded to temp,
 	 * so upload it to S3, the update the name
@@ -59,24 +63,37 @@ class Tournament extends Eloquent {
 	}
 
 	public function divisions() {
-		return $this->belongsToMany('Division');
-	}
-
-	public function users() {
-		return $this->belongsToMany('User');
+		return $this->hasMany('Division');
 	}
 
 	public function teams() {
-		return $this->belongsToMany('Team');
+        return $this->hasManyThrough('Team', 'Division', 'tournament_id', 
+				'division_id');
+	}
+
+	public function getUsers() {
+		
+		$divisionIds = $this->divisions->map(function($division) {
+			return $division->id;
+		});
+		
+		if (count($divisionIds) > 0) {
+			return User::join('division_user', 'users.id', '=', 
+					'division_user.user_id')
+				->whereIn('division_user.division_id', $divisionIds->toArray())
+				->get();
+		}
+		else {
+			return null;
+		}
 	}
 	
 	/** 
 	 * Gets the next upcoming tournament based on date
 	 */
 	public static function getUpcoming() {		
-		return Tournament::where('date', '>', time())->get()->sortBy(function($t) {
-			return $t->date;
-		})->first();
+		return Tournament::where('date', '>', date('Y-m-d H:i:s'))->
+				get()->sortBy('date')->first();
 	}
 
 	/**

@@ -15,15 +15,15 @@ class Team extends Eloquent {
 	}
 
 	public function users() {
-		return $this->belongsToMany('User');
+		return $this->belongsToMany('User')->withTimestamps();
 	}
 
-	public function divisions() {
-		return $this->belongsToMany('Division');
+	public function division() {
+		return $this->belongsTo('Division');
 	}
 
-	public function tournaments() {
-		return $this->belongsToMany('Tournament');
+	public function tournament() {
+		return $this->division()->tournament();
 	}
 
 }

@@ -79,7 +79,7 @@ $(function() {
 	@if (isset($tournament))
             <a class="btn btn-primary btn-export-players" href="/export-tournament-csv/<?= $tournament->id ?>">Export to Excel</a>
 
-            <h3>{{ $tournament->name }} <span class="title-detail deemphasis">{{ count($tournament->teams) }} teams, {{ count($tournament->users) }} players</span></h3>
+            <h3>{{ $tournament->name }} <span class="title-detail deemphasis">{{ count($tournament->teams) }} teams, {{ count($tournament->getUsers()) }} players</span></h3>
             @foreach ($tournament->divisions()->get() as $division)
                     <div class="panel panel-default">
                             <div class="panel-heading">
@@ -222,47 +222,45 @@ $(function() {
 	</div>
 </div>
 
-@if (count($myTeams))
-	@foreach ($myTeams as $team)
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h3 class="panel-title">{{ $team->name }} <span class="title-detail deemphasis">{{ count($team->users) }} players</span></h3>
-			</div>
-			<div class="panel-body">
-				<h4>Members:</h4>
-				<ul id="team-members-list">
-					@foreach ($team->users()->get() as $user)
-					<li data-user-id="{{ $user->id }}">
-						@if ($user->id == Auth::user()->id)
-							<div class="team-member-me">
-								<span class="emphasis">{{ $user->getFullName() }}</span> - {{ $user->email }}
-							</div>
-						@else
-							{{ Form::open(array('url' => '/update-teammate', 'class' => 'form-signin')) }}
-								{{ Form::text('first_name', $user->first_name, array(
-												'class' => 'form-control',
-												'placeholder' => 'First name',
-									)) }}
-								{{ Form::text('last_name', $user->last_name, array(
-												'class' => 'form-control',
-												'placeholder' => 'Last name',
-									)) }}
-								{{ Form::text('email', $user->email, array(
-												'class' => 'form-control',
-												'placeholder' => 'Email',
-									)) }}
-								{{ Form::hidden('team_id', isset($team) ? $team->id : '') }}
-								{{ Form::hidden('user_id', $user->id) }}
-								{{ Form::submit('Save', array('class' => 'btn btn-primary btn-block')) }}
-							{{ Form::close() }}
-						@endif
-					</li>
-					@endforeach
-					<button data-team-id="{{ $team->id }}" class="btn-add-teammate btn btn-primary btn-block">Add new teammate</button>
-				</ul>
-			</div>
+@if ($myTeam)
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">{{ $myTeam->name }} <span class="title-detail deemphasis">{{ count($myTeam->users) }} players</span></h3>
 		</div>
-	@endforeach
+		<div class="panel-body">
+			<h4>Members:</h4>
+			<ul id="team-members-list">
+				@foreach ($myTeam->users()->get() as $user)
+				<li data-user-id="{{ $user->id }}">
+					@if ($user->id == Auth::user()->id)
+						<div class="team-member-me">
+							<span class="emphasis">{{ $user->getFullName() }}</span> - {{ $user->email }}
+						</div>
+					@else
+						{{ Form::open(array('url' => '/update-teammate', 'class' => 'form-signin')) }}
+							{{ Form::text('first_name', $user->first_name, array(
+											'class' => 'form-control',
+											'placeholder' => 'First name',
+								)) }}
+							{{ Form::text('last_name', $user->last_name, array(
+											'class' => 'form-control',
+											'placeholder' => 'Last name',
+								)) }}
+							{{ Form::text('email', $user->email, array(
+											'class' => 'form-control',
+											'placeholder' => 'Email',
+								)) }}
+							{{ Form::hidden('team_id', isset($myTeam) ? $myTeam->id : '') }}
+							{{ Form::hidden('user_id', $user->id) }}
+							{{ Form::submit('Save', array('class' => 'btn btn-primary btn-block')) }}
+						{{ Form::close() }}
+					@endif
+				</li>
+				@endforeach
+				<button data-team-id="{{ $myTeam->id }}" class="btn-add-teammate btn btn-primary btn-block">Add new teammate</button>
+			</ul>
+		</div>
+	</div>
 @endif
 
 <div class="hidden">
