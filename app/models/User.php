@@ -120,4 +120,23 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 		return $this->belongsToMany('Team')->withTimestamps();
 	}
 	
+	/**
+	 * Returns true if user is registered for the given tournament,
+	 * else false
+	 * 
+	 * @param type $tournament
+	 */
+	public function isRegisteredForTournament($tournament) {
+		
+		$users = $tournament->getUsers();
+		
+		foreach ($users as $user) {			
+			if ($user->id == Auth::user()->id) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 }

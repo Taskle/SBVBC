@@ -81,10 +81,10 @@ class Tournament extends Eloquent {
 			return User::join('division_user', 'users.id', '=', 
 					'division_user.user_id')
 				->whereIn('division_user.division_id', $divisionIds->toArray())
-				->get();
+				->get(array('users.*'));
 		}
 		else {
-			return null;
+			return array();
 		}
 	}
 	

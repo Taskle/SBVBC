@@ -209,6 +209,16 @@ $(function() {
 	<h2>My Registration Details</h2>
 @endif
 
+@if ($tournament)
+	<p>
+		@if (Auth::user()->isRegisteredForTournament($tournament))
+			You are registered for {{ $tournament->name }} {{ $tournament->year }}. <a href="/tournaments/{{ $tournament->id }}">View tournament details</a>
+		@else
+			You are not registered for {{ $tournament->name }} {{ $tournament->year }}. <a class="emphasis" href="/tournaments/{{ $tournament->id }}">Click here to register now</a>
+		@endif
+	</p>
+@endif
+
 <div class="panel panel-default">
 	<div class="panel-heading">
 		<h3 class="panel-title">{{ Auth::user()->getFullName() }}</h3>
