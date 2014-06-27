@@ -183,7 +183,7 @@ Route::controller('password', 'RemindersController');
 
 Route::get('register', function() {
 
-	if (Auth::check()) {
+	if (Auth::check()) {		
 		$user = Auth::user();
 	}
 	else {
@@ -212,6 +212,12 @@ Route::get('register', function() {
 		$team = Team::find($division_id);
 	} else {
 		$team = null;
+	}
+	
+	// if no division, this serves as a "create user" form,
+	// but if logged in, just redirect to homepage
+	if (!$division_id && Auth::check()) {
+		return Redirect::to('/');
 	}
 
 	return View::make('register')
@@ -252,25 +258,66 @@ Route::post('register', function() {
 		$email = Input::get('email') ? Input::get('email') :
 				Input::get('stripeEmail');
 
-		// set random password if none provided
-		$password = Input::get('password') ? Input::get('password') :
-				$password = getRandomPassword();
-
-		$userParams = [
-			'first_name' => Input::get('first_name'),
-			'last_name' => Input::get('last_name'),
-			'email' => $email,
-			'password' => $password
-		];
-
-		$v = User::validate($userParams);
-
-		if (!$v->passes()) {
-			return Redirect::to('/register')->withErrors($v->messages());
+		// check if email already exists - if so, show prompt
+		// to log in first
+		$rules = array('email' => 'unique:users,email');
+		$validator = Validator::make(array('email' => $email), $rules);
+		if ($validator->fails()) {
+			
+			// try logging in with password
+			if (Auth::attempt(array(
+					'email' => Input::get('email'),
+					'password' => Input::get('password')))) {
+			
+				$fullName = Auth::user()->full_name;
+			}
+			else {
+				if (Cookie::get('stripeToken')) {
+					$errorMessage = 'Invalid email or password';
+					
+					return Redirect::to(URL::full())
+							->withInput()
+							->withErrors($errorMessage);
+				}
+				else {
+					$errorMessage = 'You already have an SBVBC account. '
+								. 'Please log in to submit your payment';
+				
+					$minutes = 60 * 24; // last for a day
+					return Redirect::to(URL::full())
+							->withInput()
+							->withCookie(Cookie::make('email', 
+									$email, $minutes))
+							->withCookie(Cookie::make('stripeToken', 
+									Input::get('stripeToken'), $minutes))
+							->withErrors($errorMessage);
+				}
+			}
 		}
+		
+		if (!Auth::check()) {
+			
+			// set random password if none provided
+			$password = Input::get('password') ? Input::get('password') :
+					$password = getRandomPassword();
 
-		$userParams['password'] = Hash::make($password);
-		$fullName = $userParams['first_name'] . ' ' . $userParams['last_name'];
+			$userParams = [
+				'first_name' => Input::get('first_name'),
+				'last_name' => Input::get('last_name'),
+				'email' => $email,
+				'password' => $password
+			];
+
+			$v = User::validate($userParams);
+
+			if (!$v->passes()) {
+				return Redirect::to('/register')->withErrors($v->messages());
+			}
+
+			$userParams['password'] = Hash::make($password);
+			$fullName = $userParams['first_name'] . ' ' . 
+					$userParams['last_name'];
+		}
 	}
 
 	Stripe::setApiKey(Config::get('app.stripe.api_key'));
@@ -326,9 +373,17 @@ Route::post('register', function() {
 		// The card has been declined
 		// redirect back to checkout page		
 		Session::flash('error', $error['message']);
+	
+		// remove cookie since token is now used
+		$cookie = Cookie::forget('stripeToken');
 		
-		return Redirect::to(URL::full())->withInput();
+		return Redirect::to(URL::full())
+				->withInput()
+				->withCookie($cookie);
 	}
+	
+	// remove cookie since token is now used
+	$cookie = Cookie::forget('stripeToken');
 
 	// create and log in user if not logged in
 	if (Auth::check()) {
@@ -404,7 +459,7 @@ Route::post('register', function() {
 	$output .= '!';
 	
 	Session::flash('success', $output);
-	return Redirect::to('/');
+	return Redirect::to('/')->withCookie($cookie);
 });
 
 function getRandomPassword() {
