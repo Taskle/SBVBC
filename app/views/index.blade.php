@@ -28,7 +28,7 @@
 	<div class="jumbotron-background">
 		<div class="container">
 			<h1>{{ $tournament->name }}</h1>
-			<h2>{{ (new DateTime($tournament->date))->format('F t, Y') }} - Open Grass Tournament</h2>
+			<h2>{{ (new DateTime($tournament->date))->format('F j, Y') }} - Open Grass Tournament</h2>
 			<p>{{ $tournament->description }}</p>
 			@if ($tournament->schedule_url)
 				<p><a target="_blank" href="{{ $tournament->schedule_url }}">View the tournament schedule</a></p>
@@ -72,7 +72,7 @@
 	@endforeach
 @else
 	
-Registration for <?= $tournament->name ?> is now closed. If you would still like to participate, please email <a href="mailto:contact@sbvbc.org">contact@sbvbc.org</a> with the division you wish to join and we will see if it's possible to accomodate you.
+Registration for <?= $tournament->name ?> is now closed. If you would still like to participate, please email <a href="mailto:contact@sbvbc.org">contact@sbvbc.org</a> with the division you wish to join and we will see if it's possible to accommodate you.
 
 @endif
 
