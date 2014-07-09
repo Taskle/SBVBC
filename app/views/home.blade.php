@@ -70,7 +70,7 @@ $(function() {
 
 @section('content')
 
-@if ($tournament->schedule_url)
+@if ($tournament && $tournament->schedule_url)
 	<p><a target="_blank" href="{{ $tournament->schedule_url }}">View the tournament schedule</a></p>
 @endif
 

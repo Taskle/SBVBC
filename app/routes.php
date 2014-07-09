@@ -48,11 +48,20 @@ Route::get('/', function() {
 	
 	if (Auth::check()) { // && Auth::user()->role != 'Admin') {
 
-		$context = array(
-			'tournament' => $upcomingTournament,
-			'myDivision' => Auth::user()->getDivision($upcomingTournament->id),
-			'myTeam' => Auth::user()->getTeam($upcomingTournament->id),
-		);
+		if ($upcomingTournament) {
+            		$context = array(
+                		'tournament' => $upcomingTournament,
+                		'myDivision' => Auth::user()->getDivision($upcomingTournament->id),
+                		'myTeam' => Auth::user()->getTeam($upcomingTournament->id),
+        		);
+                }
+                else {
+            		$context = array(
+                		'tournament' => null,
+                		'myDivision' => null,
+                		'myTeam' => null,
+        		);
+                }
 		
 		if (Auth::user()->role == 'Admin') {
 			$context['paymentStatus'] = getPaymentsByEmail();
