@@ -348,10 +348,12 @@ Route::post('register', function() {
 
 	// Create the charge on Stripe's servers - this will charge the user's card
 	try {
-		
-		if (Auth::check() && Auth::user()->stripe_id) {
-			$customer = Stripe_Customer::retrieve(Auth::user()->stripe_id);
-			
+		// Note: stripe_id's must start with cus_ - if it starts with
+            	// 'ch_' it's a charge which shouldn't be what we save here
+		if (Auth::check() && Auth::user()->stripe_id &&
+                        strpos(Auth::user()->stripe_id, 'cus_') === 0) {
+                        $customer = Stripe_Customer::retrieve(Auth::user()->stripe_id);
+                        
 			// update card on customer to this one
 			$customer->card = $stripeToken;
 			$customer->save();
