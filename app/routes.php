@@ -484,14 +484,19 @@ Route::post('update-teammate', function() {
 	$email = Input::get('email');
 	$team_id = Input::get('team_id');
 	$user_id = Input::get('user_id');
+		
+	if (!$first_name || !$last_name || !$email) {
+		return Redirect::to('/')->withErrors('Name and email are required');
+	}
 	
-	if (!$first_name || !$last_name || !$email || !$team_id) {
-		return Redirect::to('/')->withErrors('Name, email, and team ID required');
+	if (!$team_id) {
+		return Redirect::to('/')->withErrors('Team ID is required');
 	}
 
 	// look up team
 	$team = Team::find($team_id);
 	$division = $team->division;
+	$tournament = $division->tournament;
 	
 	if (!$team) {
 		return Redirect::to('/')->withErrors('Team ' . $team_id . ' not found');
@@ -533,64 +538,88 @@ Route::post('update-teammate', function() {
 		}
 	}
 	else {
-		// create new user and associate with team
-		$teammate = new User;
 		
-		$password = getRandomPassword();
+		// initiate array for sending email to new teammate
+		$emailData = [];
 		
-		$userParams = [
-			'first_name' => $first_name,
-			'last_name' => $last_name,
-			'email' => $email,
-			'password' => $password
-		];
+		// look up if user is existing via email address
+		$user = User::where('email', $email)->first();
+		//$user = (count($users) == 1) ? $users[0] : null;
+		
+		if ($user) {
+						
+			// ensure user isn't already associated with a team
+			// in the given tournament, otherwise show error
+			if ($user->isRegisteredForTournament($tournament)) {
+				
+				$existingTeam = $user->getTeam($tournament->id);
+				
+				return Redirect::to('/')->withErrors($user->full_name .
+						' is already playing in this tournament on team "' .
+						$existingTeam->name . '"');
+			}
+			
+			$emailData['isNewUser'] = false;
+		}
+		else {
+			
+			// create new user
+			$user = new User;
 
-		$v = User::validate($userParams);
+			$password = getRandomPassword();
 
-		if ($v->passes()) {
+			$userParams = [
+				'first_name' => $first_name,
+				'last_name' => $last_name,
+				'email' => $email,
+				'password' => $password
+			];
+
+			$v = User::validate($userParams);
+
+			if (!$v->passes()) {
+				return Redirect::to('/')->withErrors($v->messages());
+			}
 
 			$userParams['password'] = Hash::make($password);
 
 			// create user
 			$user = User::create($userParams);
-			
-			$user->save();
-		
-			// associate with division and team
-			$user->divisions()->save($division);
-			$user->teams()->save($team);
-		
-			$emailData = [];
-			$emailData['isNewUser'] = true;
-			$emailData['email'] = $email;
-			$emailData['password'] = $password;
-			$emailData['tournament'] = isset($tournament) ? 
-                                $tournament : '(no tournament assigned yet)';
-			$emailData['division'] = isset($division) ? 
-                                $division : '(no division assigned yet)';
-			$emailData['team'] = $team;
-			$emailData['team'] = isset($team) ? 
-                                $team : '(no team assigned yet)';
-			
-			$subject = 'SBVBC registration confirmed';
-			if (isset($tournament) && isset($tournament->name)) {
-				$subject .= ' for ' . $tournament->name;
-			}
-			
-			// send welcome email to user
-			Mail::send(array('emails.welcome-html', 'emails.welcome-text'), 
-				$emailData, function($message) use ($email, $user, $subject) {
 
-				$message->from('contact@sbvbc.org', 'SBVBC');
-				$message->to($email, $user->getFullName())->subject($subject);
-			});
+			$user->save();
 			
-			Session::flash('success', 'You have added ' . 
-					$user->full_name . ' to your team! We have sent this person a confirmation email.');
+			$emailData['isNewUser'] = true;
+			$emailData['password'] = $password;
 		}
-		else {
-			return Redirect::to('/')->withErrors($v->messages());
+
+		// associate user with division and team
+		$user->divisions()->save($division);
+		$user->teams()->save($team);
+
+		$emailData['email'] = $email;
+		$emailData['tournament'] = isset($tournament) ? 
+							$tournament : '(no tournament assigned yet)';
+		$emailData['division'] = isset($division) ? 
+							$division : '(no division assigned yet)';
+		$emailData['team'] = $team;
+		$emailData['team'] = isset($team) ? 
+							$team : '(no team assigned yet)';
+
+		$subject = 'SBVBC registration confirmed';
+		if (isset($tournament) && isset($tournament->name)) {
+			$subject .= ' for ' . $tournament->name;
 		}
+
+		// send welcome email to user
+		Mail::send(array('emails.welcome-html', 'emails.welcome-text'), 
+			$emailData, function($message) use ($email, $user, $subject) {
+
+			$message->from('contact@sbvbc.org', 'SBVBC');
+			$message->to($email, $user->getFullName())->subject($subject);
+		});
+
+		Session::flash('success', 'You have added ' . 
+				$user->full_name . ' to your team! We have sent this person a confirmation email.');
 	}
 	
 	// go back to home on success

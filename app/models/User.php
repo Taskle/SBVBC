@@ -130,8 +130,8 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 		
 		$users = $tournament->getUsers();
 		
-		foreach ($users as $user) {			
-			if ($user->id == Auth::user()->id) {
+		foreach ($users as $user) {
+			if ($user->id == $this->id) {
 				return true;
 			}
 		}
