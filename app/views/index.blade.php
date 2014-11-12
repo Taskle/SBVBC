@@ -29,7 +29,7 @@
             <div class="jumbotron-background">
                     <div class="container">
                             <h1>{{ $tournament->name }}</h1>
-                            <h2>{{ (new DateTime($tournament->date))->format('F j, Y') }} - Open Grass Tournament</h2>
+                            <h2>{{ (new DateTime($tournament->date))->format('F j, Y') }}</h2>
                             <p>{{ $tournament->description }}</p>
 			@if ($tournament->schedule_url)
                                     <p><a target="_blank" href="{{ $tournament->schedule_url }}">View the tournament schedule</a></p>
