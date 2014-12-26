@@ -43,10 +43,10 @@ form input[type="submit"] {
 	color: #aaa;
 }
 
-.placeholder {
-	color:#666
+input, textarea { 
+	color: #000;
 }
 
-.placeholderFocus {
-	color:#000
+.placeholder {
+	color: #aaa;
 }

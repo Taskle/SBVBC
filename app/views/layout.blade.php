@@ -13,7 +13,7 @@
 	<script src="/js/jquery.placeholder.min.js"></script>
 	<script>
 		$(function() {
-			$(":input[placeholder]").placeholder();
+			$('input, textarea').placeholder();
 		});
 	</script>
 	@yield('css')
