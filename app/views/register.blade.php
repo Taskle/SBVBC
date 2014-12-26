@@ -15,7 +15,7 @@
 	
 	.below-link {
 		max-width: 330px;
-		padding: 0 15px 15px 15px;
+		padding: 10px 0 0 0;
 		margin: 0 auto;
 		display: block;
 	}
