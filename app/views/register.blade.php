@@ -94,7 +94,6 @@
 			)) }}
 		{{ Form::submit('Log In & Submit Payment', array('class' => 'btn btn-primary btn-block')) }}
 	@else
-		<form action="" method="POST">
 		  <script
 			src="https://checkout.stripe.com/checkout.js" class="stripe-button"
 			data-key="{{ Config::get('app.stripe.publishable_key') }}"
@@ -114,7 +113,6 @@
 			data-description="{{ $division->name }}"
 			data-image="/images/logos/logo-large-square.png">
 		  </script>
-		</form>
 	@endif
 @elseif (!Auth::check() && !Cookie::get('stripeToken'))
 	{{ Form::text('email', $user->email, array(
