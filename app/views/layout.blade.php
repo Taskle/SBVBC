@@ -12,7 +12,9 @@
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script src="/js/jquery.placeholder.min.js"></script>
 	<script>
-	    $(":input[placeholder]").placeholder();
+		$(function() {
+			$(":input[placeholder]").placeholder();
+		});
 	</script>
 	@yield('css')
 	@yield('js')
