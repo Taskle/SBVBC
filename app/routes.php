@@ -199,7 +199,13 @@ Route::get('register', function() {
 		$user = new User;
 	}
 
-	$tournament_id = Input::get('tournament');
+	// populate data based on GET parameters or, if this was a failed
+	// post, include the params in the original POST to regenerate the same
+	// page that failed
+	$tournament_id = Input::get('tournament', Input::old('tournament_id'));
+	$division_id = Input::get('division', Input::old('division_id'));
+	$team_id = Input::get('team', Input::old('team_id'));
+	$type = Input::get('type', Input::old('type'));
 
 	if ($tournament_id) {
 		$tournament = Tournament::find($tournament_id);
@@ -207,16 +213,12 @@ Route::get('register', function() {
 		$tournament = null;
 	}
 
-	$division_id = Input::get('division');
-
 	if ($division_id) {
 		$division = Division::find($division_id);
 	} else {
 		$division = null;
 	}
 	
-	$team_id = Input::get('team');
-
 	if ($team_id) {
 		$team = Team::find($division_id);
 	} else {
@@ -230,11 +232,11 @@ Route::get('register', function() {
 	}
 
 	return View::make('register')
-					->with('user', $user)
-					->with('team', $team)
-					->with('tournament', $tournament)
-					->with('division', $division)
-					->with('type', Input::get('type'));
+			->with('user', $user)
+			->with('team', $team)
+			->with('tournament', $tournament)
+			->with('division', $division)
+			->with('type', $type);
 });
 
 Route::post('register', function() {
@@ -257,7 +259,7 @@ Route::post('register', function() {
 	
 	// default type to solo
 	$type = Input::get('type') ? Input::get('type') : 'solo';
-	
+
 	if (Auth::check()) {
 		$fullName = Auth::user()->full_name;
 		$email = Auth::user()->email;
@@ -320,7 +322,9 @@ Route::post('register', function() {
 			$v = User::validate($userParams);
 
 			if (!$v->passes()) {
-				return Redirect::to('/register')->withErrors($v->messages());
+				return Redirect::to(URL::full())
+						->withInput()
+						->withErrors($v->messages());
 			}
 
 			$userParams['password'] = Hash::make($password);
