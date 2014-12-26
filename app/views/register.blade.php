@@ -25,7 +25,7 @@
 
 @section('content')
 
-{{ Form::open(array('url' => URL::full(), 'class' => 'form-register')) }}
+{{ Form::open(array('url' => URL::current(), 'class' => 'form-register')) }}
 
 @if (!Auth::check() && Cookie::get('stripeToken'))
 	@if ($type == 'team')

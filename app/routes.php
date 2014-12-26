@@ -343,7 +343,7 @@ Route::post('register', function() {
 	}
 
 	// get price in cents for sending to stripe
-	$amount = $type == 'team' ?  ($division->team_price * 100) :
+	$amount = ($type == 'team') ? ($division->team_price * 100) :
 			($division->solo_price * 100);
 
 	// Create the charge on Stripe's servers - this will charge the user's card
