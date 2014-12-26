@@ -9,8 +9,8 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	protected $hidden = array('password');
 	protected $guarded = array('id', 'stripe_id');
 	public static $rules = array(
-		'first_name' => 'Required|Min:3',
-		'last_name' => 'Required|Min:3',
+		'first_name' => 'Required|Min:1',
+		'last_name' => 'Required|Min:1',
 		'email' => 'Required|Between:3,64|Email|Unique:users',
 		'password' => 'AlphaNum|Between:4,32',
 	);
