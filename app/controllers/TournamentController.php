@@ -18,7 +18,7 @@ class TournamentController extends BaseController {
 		$data = [['First name', 'Last name', 'Email', 'Rating', 'Division', 'Team',
 		'Paid', 'Signature']];
 
-		$paymentStatus = $this->getPaymentsByEmail();
+		$paymentStatus = $this->getPaymentsByEmail($tournament);
 
 		foreach ($tournament->getUsers()->sortBy('full_name') as $user) {
 

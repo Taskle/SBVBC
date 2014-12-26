@@ -27,7 +27,7 @@ class HomeController extends BaseController {
 			}
 
 			if (Auth::user()->role == 'Admin') {
-				$context['paymentStatus'] = $this->getPaymentsByEmail();
+				$context['paymentStatus'] = $this->getPaymentsByEmail($upcomingTournament);
 			}
 
 			return View::make('home')->with($context);

@@ -111,4 +111,30 @@ class Tournament extends Eloquent {
 			return true;
 		}
 	}
+	
+	/**
+	 * Returns object for a previous tournament, if one exists
+	 * 
+	 */
+	public function getPreviousTournament() {
+		
+		// get all tournaments, ordered by date
+		$tournaments = Tournament::all()->sortBy('date');
+		
+		// iterate through list until current tourney reached, then
+		// get previous one on list
+		foreach ($tournaments as $i => $tourney) {
+			if ($tourney == $this) {
+				
+				// if first tournament, previous is null
+				if ($i == 0) {
+					return null;
+				}
+				
+				return $tournaments[$i - 1];
+			}
+		}
+		
+		return null;
+	}
 }
