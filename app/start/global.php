@@ -48,6 +48,15 @@ Log::useFiles(storage_path().'/logs/laravel.log');
 
 App::error(function(Exception $exception, $code)
 {
+	// ignore MethodNotAllowedHttpException  to 
+	// http://ip-172-31-22-60.us-west-2.compute.internal because this is
+	// done periodically every few days and we don't want to get notified
+	// about it
+	if ($exception instanceof MethodNotAllowedHttpException &&
+		Request::fullUrl() == 'http://ip-172-31-22-60.us-west-2.compute.internal') {
+		return;
+	}
+	
 	Log::error($exception);
 });
 
