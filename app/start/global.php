@@ -48,16 +48,26 @@ Log::useFiles(storage_path().'/logs/laravel.log');
 
 App::error(function(Exception $exception, $code)
 {
-	// ignore MethodNotAllowedHttpException  to 
-	// http://ip-172-31-22-60.us-west-2.compute.internal because this is
-	// done periodically every few days and we don't want to get notified
-	// about it
-	if ($exception instanceof MethodNotAllowedHttpException &&
-		Request::fullUrl() == 'http://ip-172-31-22-60.us-west-2.compute.internal') {
-		return;
+	Log::error($exception);
+	
+	$message = 'Url: ' . Request::fullUrl() .
+                '<br><br>Input: ' . json_encode(Input::all()) .
+                '<br><br>' . $exception . 
+                '<br><br>' . $exception->getTraceAsString();
+	
+	// ignore 404s and MethodNotAllowedHttpExceptions
+	if ($code == 404 || $exception instanceof MethodNotAllowedHttpException) {
+		return Response::view('errors.404', array(), 404);
 	}
 	
-	Log::error($exception);
+	if (Config::getEnvironment() == 'production') {
+		$data = array('exception' => $message);
+		Mail::send('emails.error', $data, function($message) {
+			$message->to(Config::get('app.error_email'))->subject('SBVBC Website Error');
+		});
+		Log::info('Error Email sent to ' . Config::get('settings.error_email'));
+		return Response::view('errors.500', array(), 500);
+	}
 });
 
 /*
@@ -108,27 +118,3 @@ Request::setTrustedProxies(array(
 	'162.158.0.0/15',
 	'104.16.0.0/12'
 ));
-
-/** Log errors and send email if this is production
- */
-App::error(function(Exception $exception, $code) {
-	
-	$message = 'Url: ' . Request::fullUrl() .
-                '<br><br>Input: ' . json_encode(Input::all()) .
-                '<br><br>' . $exception . 
-                '<br><br>' . $exception->getTraceAsString();
-	
-	// ignore 404s
-	if ($code == 404) {
-		return Response::view('errors.404', array(), 404);
-	}
-	
-	if (Config::getEnvironment() == 'production') {
-		$data = array('exception' => $message);
-		Mail::send('emails.error', $data, function($message) {
-			$message->to(Config::get('app.error_email'))->subject('SBVBC Website Error');
-		});
-		Log::info('Error Email sent to ' . Config::get('settings.error_email'));
-		return Response::view('errors.500', array(), 500);
-	}
-});
