@@ -33,6 +33,14 @@ ClassLoader::addDirectories(array(
 
 Log::useFiles(storage_path().'/logs/laravel.log');
 
+/**
+ * Handler for 404s
+ */
+App::missing(function($exception)
+{
+    return Response::view('errors.404', array(), 404);
+});
+
 /*
   |--------------------------------------------------------------------------
   | Application Error Handler
