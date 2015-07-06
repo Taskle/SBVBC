@@ -83,7 +83,7 @@ class TeamController extends BaseController {
 
 					$existingTeam = $user->getTeam($tournament->id);
 
-					return Redirect::to('/')->withErrors($user->full_name .
+					return Redirect::to('/')->withErrors($user->getFullName() .
 									' is already playing in this tournament on team "' .
 									$existingTeam->name . '"');
 				}

@@ -73,15 +73,15 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	public function getReminderEmail() {
 		return $this->email;
 	}
-	
+
 	/** accessor for using in admin views, etc.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function getFullNameAttribute() {
 		return ucfirst($this->first_name) . ' ' . ucfirst($this->last_name);
 	}
-	
+
 	/**
 	 * Gets team user is on for the given tournament
 	 */
@@ -90,13 +90,13 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 			return ($team->division->tournament->id == $tournamentId);
 		})->first();
 	}
-	
+
 	/**
 	 * Gets team user is on for the given tournament
 	 */
 	public function getDivision($tournamentId) {
 
-		return Division::join('division_user', 'division_id', '=', 
+		return Division::join('division_user', 'division_id', '=',
 				'divisions.id')
 			->where('division_user.user_id', '=', $this->id)
 			->where('divisions.tournament_id', '=', $tournamentId)
@@ -109,7 +109,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	 * @return string
 	 */
 	public function getFullName() {
-		return $this->first_name . ' ' . $this->last_name;
+		return $this->getFullNameAttribute();
 	}
 
 	public function divisions() {
@@ -119,24 +119,24 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	public function teams() {
 		return $this->belongsToMany('Team')->withTimestamps();
 	}
-	
+
 	/**
 	 * Returns true if user is registered for the given tournament,
 	 * else false
-	 * 
+	 *
 	 * @param type $tournament
 	 */
 	public function isRegisteredForTournament($tournament) {
-		
+
 		$users = $tournament->getUsers();
-		
+
 		foreach ($users as $user) {
 			if ($user->id == $this->id) {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 }
