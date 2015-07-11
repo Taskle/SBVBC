@@ -83,9 +83,17 @@ class TeamController extends BaseController {
 
 					$existingTeam = $user->getTeam($tournament->id);
 
-					return Redirect::to('/')->withErrors($user->getFullName() .
-									' is already playing in this tournament on team "' .
-									$existingTeam->name . '"');
+					// if registered as individual they may not be on a team
+					if ($existingTeam) {
+						return Redirect::to('/')->withErrors($user->getFullName() .
+										' is already playing in this tournament on team "' .
+										$existingTeam->name . '"');
+					}
+					else {
+						return Redirect::to('/')->withErrors($user->getFullName() .
+								" is already registered for this tournament. " .
+								"Please email contact@sbvbc.org to change this person's team.");
+					}
 				}
 
 				$emailData['isNewUser'] = false;

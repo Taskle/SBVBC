@@ -57,17 +57,20 @@ App::missing(function($exception)
 App::error(function(Exception $exception, $code)
 {
 	Log::error($exception);
-	
+
 	$message = 'Url: ' . Request::fullUrl() .
                 '<br><br>Input: ' . json_encode(Input::all()) .
-                '<br><br>' . $exception . 
+                '<br><br>' . $exception .
                 '<br><br>' . $exception->getTraceAsString();
-	
-	// ignore 404s and MethodNotAllowedHttpExceptions
-	if ($code == 404 || $exception instanceof MethodNotAllowedHttpException) {
+
+	// ignore 404s, MethodNotAllowedHttpExceptions, and urls
+	// with "compute.internal" (hit by AWS)
+	if ($code == 404 ||
+		$exception instanceof MethodNotAllowedHttpException ||
+		strpos(Request::fullUrl(), '.compute.internal') !== FALSE) {
 		return Response::view('errors.404', array(), 404);
 	}
-	
+
 	if (Config::getEnvironment() == 'production') {
 		$data = array('exception' => $message);
 		Mail::send('emails.error', $data, function($message) {

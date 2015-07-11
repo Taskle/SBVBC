@@ -86,9 +86,17 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	 * Gets team user is on for the given tournament
 	 */
 	public function getTeam($tournamentId) {
-		return $this->teams->filter(function($team) use ($tournamentId) {
+
+		$teams = $this->teams->filter(function($team) use ($tournamentId) {
 			return ($team->division->tournament->id == $tournamentId);
-		})->first();
+		});
+
+		if ($teams && $teams->count() > 0) {
+			return $teams->first();
+		}
+		else {
+			return null;
+		}
 	}
 
 	/**
