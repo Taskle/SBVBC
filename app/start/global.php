@@ -64,10 +64,11 @@ App::error(function(Exception $exception, $code)
                 '<br><br>' . $exception->getTraceAsString();
 
 	// ignore 404s, MethodNotAllowedHttpExceptions, and urls
-	// with "compute.internal" (hit by AWS)
+	// that don't have sbvbc.org, e.g. "compute.internal" (hit by AWS)
+	// or static urls
 	if ($code == 404 ||
 		$exception instanceof MethodNotAllowedHttpException ||
-		strpos(Request::fullUrl(), '.compute.internal') !== FALSE) {
+		strpos(Request::fullUrl(), '.sbvbc.org') === FALSE) {
 		return Response::view('errors.404', array(), 404);
 	}
 
