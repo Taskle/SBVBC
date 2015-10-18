@@ -16,9 +16,9 @@
 			@if (isset($team) && isset($team->name))
 				Team name: {{ $team->name }}<br />
 				<br />
-				You can edit your team name and members at <a href="http://www.sbvbc.org">http://www.sbvbc.org</a>.<br />						
+				You can edit your team name and members at <a href="http://play.sbvbc.org">http://play.sbvbc.org</a>.<br />
 			@else
-				If you registered for a team, you can edit your team name and members at <a href="http://www.sbvbc.org">http://www.sbvbc.org</a>.<br />			
+				If you registered for a team, you can edit your team name and members at <a href="http://play.sbvbc.org">http://play.sbvbc.org</a>.<br />
 			@endif
 			<br />
 			@if ($isNewUser)

@@ -9,12 +9,12 @@ You are now registered for the South Bay Volleyball Club!
 @if (isset($team) && isset($team->name))
 Team name: {{ $team->name }}
 
-You can edit your team name and members at http://www.sbvbc.org.					
+You can edit your team name and members at http://play.sbvbc.org.
 @else
-If you registered for a team, you can edit your team name and members at http://www.sbvbc.org.		
+If you registered for a team, you can edit your team name and members at http://play.sbvbc.org.
 @endif
 
-If you registered for a team, you can edit your team name and members at http://www.sbvbc.org.
+If you registered for a team, you can edit your team name and members at http://play.sbvbc.org.
 
 @if ($isNewUser)
 Email: {{ $email }}
