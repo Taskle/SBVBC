@@ -54,10 +54,10 @@
                                             <div class="volleyball-division-details">
                                                     <p>{{ $division->description }}</p>
                                                     @if ($division->allow_team_registration && $division->allow_solo_registration)
-														<span class="emphasis">${{ $division->formatted_team_price }}</span> for {{ $division->team_size }} people, <span class="emphasis">${{ $division->formatted_additional_team_member_price }}</span> per additional
+														<span class="emphasis">${{ $division->formatted_team_price }}</span> for up to {{ $division->min_team_members }} people, <span class="emphasis">${{ $division->formatted_additional_team_member_price }}</span> per additional
 														<br><span class="emphasis">${{ $division->formatted_solo_price }}</span> per person without team
                                                     @elseif ($division->allow_team_registration)
-                                                    <span class="emphasis">${{ $division->formatted_team_price }}</span> for {{ $division->team_size }} people, <span class="emphasis">${{ $division->formatted_additional_team_member_price }}</span> per additional
+                                                    <span class="emphasis">${{ $division->formatted_team_price }}</span> for up to {{ $division->min_team_members }} people, <span class="emphasis">${{ $division->formatted_additional_team_member_price }}</span> per additional
                                                     @elseif ($division->allow_solo_registration)
                                                             <span class="emphasis">${{ $division->formatted_solo_price }}</span> per person
                                                     @endif
