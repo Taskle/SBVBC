@@ -11,11 +11,11 @@
 		background-size: cover;
 		background-position-y: 50%;
 	}
-	
+
 	.emphasis {
 		font-weight: bold;
 	}
-	
+
 	.volleyball-division-details {
 		min-height: 130px;
 	}
@@ -53,8 +53,8 @@
                                             <div class="volleyball-division-details">
                                                     <p>{{ $division->description }}</p>
                                                     @if ($division->allow_team_registration && $division->allow_solo_registration)
-                                                    <span class="emphasis">${{ $division->formatted_team_price }}</span> for {{ $division->team_size }} people, <span class="emphasis">${{ $division->formatted_additional_team_member_price }}</span> per additional
-                                                            ${{ $division->formatted_solo_price }} per person (w/o team)
+														<span class="emphasis">${{ $division->formatted_team_price }}</span> for {{ $division->team_size }} people, <span class="emphasis">${{ $division->formatted_additional_team_member_price }}</span> per additional
+														<br><span class="emphasis">${{ $division->formatted_solo_price }}</span> per person without team
                                                     @elseif ($division->allow_team_registration)
                                                     <span class="emphasis">${{ $division->formatted_team_price }}</span> for {{ $division->team_size }} people, <span class="emphasis">${{ $division->formatted_additional_team_member_price }}</span> per additional
                                                     @elseif ($division->allow_solo_registration)
@@ -66,6 +66,9 @@
                                             @endif
                                             @if ($division->allow_team_registration)
                                                     <a href="/register?type=team&tournament={{ $tournament->id }}&division={{ $division->id }}" class="btn btn-primary btn-block">Register Team</a>
+                                            @endif
+                                            @if ($division->allow_additional_team_member)
+                                                    <a href="/register?type=additional&tournament={{ $tournament->id }}&division={{ $division->id }}" class="btn btn-primary btn-block">Register Additional Player</a>
                                             @endif
                                     </div>
                             </div>

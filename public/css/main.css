@@ -50,3 +50,7 @@ input, textarea {
 .placeholder {
 	color: #aaa;
 }
+
+.clearfix {
+	clear: both;
+}

@@ -7,19 +7,19 @@
 		padding: 15px;
 		margin: 0 auto;
 	}
-	
+
 	#forgot-password-link {
 		margin-top: 10px;
 		display: block;
 	}
-	
+
 	.below-link {
 		max-width: 330px;
 		padding: 10px 0 0 0;
 		margin: 0 auto;
 		display: block;
 	}
-	
+
 </style>
 @stop
 
@@ -30,12 +30,16 @@
 @if (!Auth::check() && Cookie::get('stripeToken'))
 	@if ($type == 'team')
 		<h2 class="form-register-heading">Log In & Pay for Team</h2>
+	@elseif ($type == 'additional')
+		<h2 class="form-register-heading">Log In & Pay for Additional Player</h2>
 	@else
 		<h2 class="form-register-heading">Log In & Pay</h2>
 	@endif
 @else
 	@if ($type == 'team')
 		<h2 class="form-register-heading">Register Team</h2>
+	@elseif ($type == 'additional')
+		<h2 class="form-register-heading">Additional Player</h2>
 	@else
 		<h2 class="form-register-heading">Register Individual</h2>
 	@endif
@@ -45,7 +49,29 @@
 	<p>{{ $tournament->name }} - {{ $division->name }}</p>
 @endif
 
-@if (!Auth::check() && !Cookie::get('stripeToken'))
+@if ($type == 'additional')
+	{{ Form::text('first_name', $proxy ? null : $user->first_name, array(
+					'class' => 'form-control',
+					'placeholder' => 'Teammate First name',
+					'required' => true,
+					'autofocus' => true,
+		)) }}
+	{{ Form::text('last_name', $proxy ? null : $user->last_name, array(
+					'class' => 'form-control',
+					'placeholder' => 'Teammate Last name',
+					'required' => true,
+		)) }}
+	@if ($proxy)
+		{{ Form::text('email', null, array(
+					'class' => 'form-control',
+					'placeholder' => 'Teammate Email',
+					'required' => true,
+		)) }}
+		{{ Form::hidden('proxy', true, array(
+					'required' => true,
+		)) }}
+	@endif
+@elseif (!Auth::check() && !Cookie::get('stripeToken'))
 	{{ Form::text('first_name', $user->first_name, array(
 					'class' => 'form-control',
 					'placeholder' => 'First name',
@@ -58,11 +84,17 @@
 					'required' => true,
 		)) }}
 @endif
-		
+
 @if ($type == 'team')
-	{{ Form::text('team_name', $team ? $team->name : '', array(
+	{{ Form::text('team_name', isset($team) ? $team->name : '', array(
 				'class' => 'form-control',
 				'placeholder' => 'Team name',
+				'required' => true,
+	)) }}
+@elseif ($type == 'additional')
+	<p>Team</p>
+	{{ Form::select('team_id', Team::where('division_id', $division->id)->lists('name', 'id'), $team->id, array(
+				'class' => 'form-control',
 				'required' => true,
 	)) }}
 @endif
@@ -76,7 +108,7 @@
 		)) }}
 	{{ Form::password('password', array(
 					'placeholder' => 'Password',
-					'class' => 'form-control', 
+					'class' => 'form-control',
 					'required' => true,
 		)) }}
 @endif
@@ -99,6 +131,8 @@
 			data-key="{{ Config::get('app.stripe.publishable_key') }}"
 			@if ($type == 'team')
 				data-amount="{{ $division->team_price * 100.0 }}"
+			@elseif ($type == 'additional')
+				data-amount="{{ $division->additional_team_member_price * 100.0 }}"
 			@else
 				data-amount="{{ $division->solo_price * 100.0 }}"
 			@endif
@@ -122,7 +156,7 @@
 		)) }}
 	{{ Form::password('password', array(
 					'placeholder' => 'New Password',
-					'class' => 'form-control', 
+					'class' => 'form-control',
 					'required' => true,
 		)) }}
 	{{ Form::submit('Register', array('class' => 'btn btn-primary btn-block')) }}

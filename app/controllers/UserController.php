@@ -76,6 +76,7 @@ class UserController extends BaseController {
 		$division_id = Input::get('division', Input::old('division_id'));
 		$team_id = Input::get('team', Input::old('team_id'));
 		$type = Input::get('type', Input::old('type'));
+		$proxy = Input::get('proxy', Input::old('proxy'));
 
 		if ($tournament_id) {
 			$tournament = Tournament::find($tournament_id);
@@ -90,7 +91,7 @@ class UserController extends BaseController {
 		}
 
 		if ($team_id) {
-			$team = Team::find($division_id);
+			$team = Team::find($team_id);
 		} else {
 			$team = null;
 		}
@@ -106,7 +107,8 @@ class UserController extends BaseController {
 						->with('team', $team)
 						->with('tournament', $tournament)
 						->with('division', $division)
-						->with('type', $type);
+						->with('type', $type)
+						->with('proxy', $proxy);
 	}
 
 	/**
@@ -115,16 +117,21 @@ class UserController extends BaseController {
 	 * @return Response
 	 */
 	public function postRegister() {
+
 		// set params passed in
 		$tournament_id = Input::get('tournament_id');
 		$division_id = Input::get('division_id');
+		$team_id = Input::get('team_id');
+		$proxy = Input::get('proxy');
 		$type = Input::get('type') ? Input::get('type') : 'solo'; // default solo
 		// generate original URL with all GET params in case there is a failure
 		// and we need to redirect back to it
 		$originalUrl = URL::action('UserController@getRegister', array(
 			'type' => $type,
 			'tournament' => $tournament_id,
-			'division' => $division_id
+			'division' => $division_id,
+			'team' => $team_id,
+			'proxy' => ($proxy == 1)
 		));
 
 		if ($tournament_id) {
@@ -139,13 +146,35 @@ class UserController extends BaseController {
 			$division = null;
 		}
 
-		if (Auth::check()) {
-			$fullName = Auth::user()->full_name;
-			$email = Auth::user()->email;
+		if ($team_id) {
+			$team = Team::find($team_id);
 		} else {
+			$team = null;
+		}
+
+		// if logged in, this is a new team or an individual registration;
+		// if additional, this is someone paying "8th player fee" for their current team
+		if (Auth::check()) {
+
+			$email = Auth::user()->email;
+
+			if ($proxy) {
+				$teammateFirstName = Input::get('first_name');
+				$teammateLastName = Input::get('last_name');
+				$teammateEmail = Input::get('email');
+			}
+			else {
+				$teammateFirstName = Auth::user()->first_name;
+				$teammateLastName = Auth::user()->last_name;
+				$teammateEmail = Auth::user()->email;
+			}
+
+		} else {
+
 			// fetch email from form provided
 			$email = Input::get('email') ? Input::get('email') :
 					Input::get('stripeEmail');
+			$teammateEmail = $email;
 
 			// check if email already exists - if so, show prompt
 			// to log in first
@@ -158,7 +187,9 @@ class UserController extends BaseController {
 							'email' => Input::get('email'),
 							'password' => Input::get('password')))) {
 
-					$fullName = Auth::user()->full_name;
+					$teammateFirstName = Auth::user()->first_name;
+					$teammateLastName = Auth::user()->last_name;
+
 				} else {
 					if (Cookie::get('stripeToken')) {
 						$errorMessage = 'Invalid email or password';
@@ -202,8 +233,9 @@ class UserController extends BaseController {
 				}
 
 				$userParams['password'] = Hash::make($password);
-				$fullName = $userParams['first_name'] . ' ' .
-						$userParams['last_name'];
+
+				$teammateFirstName = $userParams['first_name'];
+				$teammateLastName = $userParams['last_name'];
 			}
 		}
 
@@ -219,10 +251,24 @@ class UserController extends BaseController {
 		if ($division && isset($division->name)) {
 			$description .= ' - ' . $division->name;
 		}
+		if (isset($teammateFirstName) && isset($teammateLastName)) {
+			$description .= ' - ' . $teammateFirstName . ' ' . $teammateLastName;
+		}
 
 		// get price in cents for sending to stripe
-		$amount = ($type == 'team') ? ($division->team_price * 100) :
-				($division->solo_price * 100);
+		$amountInDollars = 0;
+
+		if ($type == 'team') {
+			$amountInDollars = $division->team_price;
+		}
+		elseif ($type == 'additional') {
+			$amountInDollars = $division->additional_team_member_price;
+		}
+		else {
+			$amountInDollars = $division->solo_price;
+		}
+
+		$amountInCents = $amountInDollars * 100;
 
 		// Create the charge on Stripe's servers - this will charge the user's card
 		try {
@@ -242,13 +288,13 @@ class UserController extends BaseController {
 				$customer = Stripe_Customer::create(array(
 							"card" => $stripeToken,
 							"email" => $email,
-							"description" => $fullName
+							"description" => $teammateFirstName . ' ' . $teammateLastName
 				));
 			}
 
 			// Charge the Customer instead of the card
 			$charge = Stripe_Charge::create(array(
-						"amount" => $amount,
+						"amount" => $amountInCents,
 						"currency" => "usd",
 						"customer" => $customer->id,
 						"description" => $description
@@ -259,7 +305,7 @@ class UserController extends BaseController {
 			$error = $e_json['error'];
 
 			// The card has been declined
-			// redirect back to checkout page		
+			// redirect back to checkout page
 			Session::flash('error', $error['message']);
 
 			// remove cookie since token is now used
@@ -306,6 +352,19 @@ class UserController extends BaseController {
 			$user->teams()->save($team);
 		}
 
+		// if this is an additional player, associate to the given team
+		if ($type == 'additional') {
+
+			if ($proxy) {
+				$team->registerUserByProxy($tournament, $division, $teammateFirstName, $teammateLastName,
+						$teammateEmail, $this->getRandomPassword());
+			}
+			else {
+				// associate team to user
+				$user->teams()->save($team);
+			}
+		}
+
 		$emailData = array(
 			'isNewUser' => $isNewUser
 		);
@@ -318,6 +377,9 @@ class UserController extends BaseController {
 		$emailData['tournament'] = $tournament;
 		$emailData['division'] = $division;
 
+		$emailData['proxy'] = $proxy;
+		$emailData['playerName'] = $teammateFirstName . ' ' . $teammateLastName;
+
 		if (isset($team)) {
 			$emailData['team'] = $team;
 		}
@@ -328,14 +390,22 @@ class UserController extends BaseController {
 		}
 
 		// send email confirmation to user
-		Mail::send(array('emails.welcome-html', 'emails.welcome-text'), $emailData, function($message) use ($email, $user, $subject) {
+		Mail::send(array('emails.welcome-html', 'emails.welcome-text'), $emailData,
+				function($message) use ($email, $user, $subject) {
 
 			$message->from('contact@sbvbc.org', 'SBVBC');
 			$message->to($email, $user->getFullName())->subject($subject);
 		});
 
 		// add tournament and division to stripe description if they're set
-		$output = 'You are now registered';
+
+		if ($proxy) {
+			$output = $emailData['playerName'] . ' is now registered';
+		}
+		else {
+			$output = 'You are now registered';
+		}
+
 		if ($tournament && isset($tournament->name)) {
 			$output .= ' for ' . $tournament->name;
 		}

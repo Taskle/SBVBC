@@ -2,12 +2,12 @@
 
 @section('css')
 <style>
-	
+
 #team-members-list {
 	padding-left: 0;
 }
 
-#team-members-list > li {	
+#team-members-list > li {
 	list-style-type: none;
 	clear: both;
 }
@@ -26,7 +26,8 @@
 	margin-bottom: 10px;
 }
 
-.btn-add-teammate {
+.btn-add-teammate,
+.btn-pay-for-player {
 	clear: both;
 	margin-top: 10px;
 	width: 150px;
@@ -48,11 +49,11 @@
 <script>
 
 $(function() {
-		
+
 	$(document).on('click touchstart', '.btn-add-teammate', function() {
 		$('.new-teammate-form input[name="team_id"]')
 				.val($(this).data('team-id'));
-		$(this).before('<li>' + 
+		$(this).before('<li>' +
 				$('.new-teammate-form').html() + '</li>');
 	});
 });
@@ -205,14 +206,14 @@ $(function() {
                     </div>
             @endforeach
         @endif
-        
+
 	<h2>My Registration Details</h2>
 @endif
 
 @if ($tournament)
 	<p>
 		@if (Auth::user()->isRegisteredForTournament($tournament))
-			You are registered for {{ $tournament->name }} {{ $tournament->year }}. <a href="/tournaments/{{ $tournament->id }}">View tournament details</a>
+			You are registered for {{ $tournament->name }} {{ $tournament->year }}. <a href="/tournaments/{{ $tournament->id }}" target="_blank">View tournament details</a>
 		@else
 			You are not registered for {{ $tournament->name }} {{ $tournament->year }}. <a class="emphasis" href="/tournaments/{{ $tournament->id }}">Click here to register now</a>
 		@endif
@@ -224,57 +225,69 @@ $(function() {
 		<h3 class="panel-title">{{ Auth::user()->getFullName() }}</h3>
 	</div>
 	<div class="panel-body">
+		<p>Email: {{ Auth::user()->email }}</p>
+		<p>
 		@if (Auth::user()->rating)
 			Rating: {{ Auth::user()->rating  }}
 		@else
 			Unrated
 		@endif
+		</p>
 	</div>
 </div>
 
 @if ($myTeam)
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h3 class="panel-title">{{ $myTeam->name }} <span class="title-detail deemphasis">{{ count($myTeam->users) }} players</span></h3>
+			<h3 class="panel-title">{{ $myTeam->name }} - {{ $myTeam->division->name }} <span class="title-detail deemphasis">{{ count($myTeam->users) - 1 }} teammates</span></h3>
 		</div>
 		<div class="panel-body">
-			<h4>Members:</h4>
-			<ul id="team-members-list">
-				@foreach ($myTeam->users()->get() as $user)
-				<li data-user-id="{{ $user->id }}">
-					@if ($user->id == Auth::user()->id)
-						<div class="team-member-me">
-							<span class="emphasis">{{ $user->getFullName() }}</span> - {{ $user->email }}
-						</div>
-					@else
-						{{ Form::open(array('url' => '/update-teammate', 'class' => 'form-signin')) }}
-							{{ Form::text('first_name', $user->first_name, array(
-											'class' => 'form-control',
-											'placeholder' => 'First name',
-								)) }}
-							{{ Form::text('last_name', $user->last_name, array(
-											'class' => 'form-control',
-											'placeholder' => 'Last name',
-								)) }}
-							{{ Form::text('email', $user->email, array(
-											'class' => 'form-control',
-											'placeholder' => 'Email',
-								)) }}
-							{{ Form::hidden('team_id', isset($myTeam) ? $myTeam->id : '') }}
-							{{ Form::hidden('user_id', $user->id) }}
-							{{ Form::submit('Save', array('class' => 'btn btn-primary btn-block')) }}
-						{{ Form::close() }}
+			<div>
+				<ul id="team-members-list">
+					@foreach ($myTeam->users()->get() as $user)
+						<li data-user-id="{{ $user->id }}">
+							@if ($user->id != Auth::user()->id)
+								{{ Form::open(array('url' => '/update-teammate', 'class' => 'form-signin')) }}
+									{{ Form::text('first_name', $user->first_name, array(
+													'class' => 'form-control',
+													'placeholder' => 'First name',
+										)) }}
+									{{ Form::text('last_name', $user->last_name, array(
+													'class' => 'form-control',
+													'placeholder' => 'Last name',
+										)) }}
+									{{ Form::text('email', $user->email, array(
+													'class' => 'form-control',
+													'placeholder' => 'Email',
+										)) }}
+									{{ Form::hidden('team_id', isset($myTeam) ? $myTeam->id : '') }}
+									{{ Form::hidden('user_id', $user->id) }}
+									{{ Form::submit('Save', array('class' => 'btn btn-primary btn-block')) }}
+								{{ Form::close() }}
+							@endif
+						</li>
+					@endforeach
+					@if (count($myTeam->users) < $myTeam->division->min_team_members)
+						<button data-team-id="{{ $myTeam->id }}" class="btn-add-teammate btn btn-primary btn-block">Add new teammate</button>
 					@endif
-				</li>
-				@endforeach
-				<button data-team-id="{{ $myTeam->id }}" class="btn-add-teammate btn btn-primary btn-block">Add new teammate</button>
-			</ul>
+				</ul>
+			</div>
+			<div class="clearfix">
+				@if (count($myTeam->users) >= $myTeam->division->max_team_members + 5)
+					<p>You've reached the maximum number of players ({{ $myTeam->division->max_team_members }}).</p>
+				@elseif (count($myTeam->users) >= $myTeam->division->min_team_members)
+					<p>After {{ $myTeam->division->min_team_members }} players, each additional costs ${{ $myTeam->division->formatted_additional_team_member_price }} ({{ $myTeam->division->max_team_members }} players maximum).</p>
+					<a href="/register?type=additional&tournament={{ $tournament->id }}&division={{ $myTeam->division->id }}&team={{ $myTeam->id }}&proxy=1" class="btn-pay-for-player btn btn-primary btn-block">Add player for ${{ $myTeam->division->formatted_additional_team_member_price }}</a>
+				@endif
+			</div>
 		</div>
 	</div>
 @endif
 
+<p>Questions or concerns? Email <a href="mailto:contact@sbvbc.org">contact@sbvbc.org</a>.</p>
+
 <div class="hidden">
-	<div class="new-teammate-form">		
+	<div class="new-teammate-form">
 		{{ Form::open(array('url' => '/update-teammate',
 			'class' => 'form-signin'
 		)) }}

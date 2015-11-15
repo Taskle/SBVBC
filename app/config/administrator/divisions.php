@@ -35,8 +35,8 @@ return array(
 			'title' => 'Solo reg?',
 			'sort_field' => 'allow_solo_registration'
 		)
-	),	
-	
+	),
+
 	/**
 	 * The filter set
 	 */
@@ -84,11 +84,11 @@ return array(
 			'type' => 'number',
 		),
 		'min_team_members' => array(
-			'title' => 'Minimum team size',
+			'title' => 'Max team size (at no additional fee)',
 			'type' => 'number',
 		),
 		'max_team_members' => array(
-			'title' => 'Maximum team size',
+			'title' => 'Max team size overall',
 			'type' => 'number',
 		),
 		'solo_price' => array(
@@ -116,7 +116,7 @@ return array(
 		'allow_solo_registration' => array(
 			'title' => 'Allow solo registration?',
 			'type' => 'bool',
-		),		
+		),
 		'description' => array(
 			'title' => 'General description',
 			'type' => 'markdown',

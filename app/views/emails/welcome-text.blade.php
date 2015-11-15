@@ -1,9 +1,17 @@
 SBVBC Registration Confirmation
 
 @if (isset($tournament) && isset($tournament->name))
-You are now registered for the {{ $tournament->name }}!
+@if (isset($proxy))
+{{ $playerName }} now registered for the {{ $tournament->name }}!<br />
 @else
-You are now registered for the South Bay Volleyball Club!
+You are now registered for the {{ $tournament->name }}!<br />
+@endif
+@else
+@if (isset($proxy))
+{{ $playerName }} is now registered for the South Bay Volleyball Club!<br />
+@else
+You are now registered for the South Bay Volleyball Club!<br />
+@endif
 @endif
 
 @if (isset($team) && isset($team->name))

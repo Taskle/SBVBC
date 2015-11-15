@@ -7,11 +7,19 @@
 		<h2>SBVBC Registration Confirmation</h2>
 
 		<div>
-                        @if (isset($tournament) && isset($tournament->name))
-                            You are now registered for the {{ $tournament->name }}!<br />
-                        @else
-                            You are now registered for the South Bay Volleyball Club!<br />
-                        @endif
+			@if (isset($tournament) && isset($tournament->name))
+				@if (isset($proxy))
+					{{ $playerName }} now registered for the {{ $tournament->name }}!<br />
+				@else
+					You are now registered for the {{ $tournament->name }}!<br />
+				@endif
+			@else
+				@if (isset($proxy))
+					{{ $playerName }} is now registered for the South Bay Volleyball Club!<br />
+				@else
+					You are now registered for the South Bay Volleyball Club!<br />
+				@endif
+			@endif
 			<br />
 			@if (isset($team) && isset($team->name))
 				Team name: {{ $team->name }}<br />

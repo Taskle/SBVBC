@@ -15,7 +15,7 @@ class Division extends Eloquent {
 	}
 
 	/** accessor for using in admin views, etc.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function getFormattedSoloPriceAttribute() {
@@ -23,7 +23,7 @@ class Division extends Eloquent {
 	}
 
 	/** accessor for using in admin views, etc.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function getFormattedTeamPriceAttribute() {
@@ -31,7 +31,7 @@ class Division extends Eloquent {
 	}
 
 	/** accessor for using in admin views, etc.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function getFormattedAdditionalTeamMemberPriceAttribute() {
@@ -39,22 +39,30 @@ class Division extends Eloquent {
 				$this->additional_team_member_price);
 	}
 
+	/** accessor for using in admin views, etc.
+	 *
+	 * @return boolean
+	 */
+	public function getAllowAdditionalTeamMemberAttribute() {
+		return ($this->max_team_members > $this->min_team_members);
+	}
+
 	public function getLongNameAttribute() {
 		return $this->tournament->name . ' ' .
 				$this->tournament->year . ' - ' . $this->name;
 	}
-	
+
 	/**
 	 * Returns all players without teams
 	 */
 	public function getUnassignedPlayers() {
 		return $this->users->filter(function($user) {
 			return (count($user->teams->filter(function($team) {
-				return ($team->division_id == $this->id);				
+				return ($team->division_id == $this->id);
 			})) == 0);
 		});
 	}
-	
+
 	/**
 	 * Get the unique identifier for the user.
 	 *
