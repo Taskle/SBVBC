@@ -17,7 +17,8 @@
 	}
 
 	.volleyball-division-details {
-		min-height: 130px;
+		min-height: 65px;
+		margin-bottom: 20px;
 	}
 </style>
 @stop
