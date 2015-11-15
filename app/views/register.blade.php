@@ -92,8 +92,8 @@
 				'required' => true,
 	)) }}
 @elseif ($type == 'additional')
-	<p>Team</p>
-	{{ Form::select('team_id', Team::where('division_id', $division->id)->lists('name', 'id'), $team->id, array(
+	<p>Select team. Don't see it? <a href="/register?type=team&tournament={{ $tournament->id }}&division={{ $division->id }}">Register your team</a></p>
+	{{ Form::select('team_id', Team::where('division_id', $division->id)->lists('name', 'id'), isset($team) ? $team->id : null, array(
 				'class' => 'form-control',
 				'required' => true,
 	)) }}

@@ -102,6 +102,14 @@ class UserController extends BaseController {
 			return Redirect::to('/');
 		}
 
+		// if this is an "additional player" request, there
+		// must be teams, so if no teams, show error
+		if ($type == 'additional' && $division->teams->count() == 0) {
+			$errorMessage = 'Please register your team first before adding additional players.';
+			return Redirect::to('/')
+				->withErrors($errorMessage);
+		}
+
 		return View::make('register')
 						->with('user', $user)
 						->with('team', $team)
