@@ -35,7 +35,8 @@ class TeamController extends BaseController {
 		// ensure current user is associated with this team
 		$found = false;
 		foreach ($team->users as $teammate) {
-			if ($teammate->id == Auth::user()->id) {
+			if (Auth::user() != null && $teammate != null &&
+				$teammate->id == Auth::user()->id) {
 				$found = true;
 				break;
 			}
