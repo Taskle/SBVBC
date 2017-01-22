@@ -30,3 +30,7 @@ Route::get('/tournaments/{id}', 'TournamentController@getTournament');
 
 // teams
 Route::post('update-teammate', 'TeamController@postUpdateTeammate');
+
+// verify apply pay
+Route::get('/.well-known/apple-developer-merchantid-domain-association',
+			'HomeController@getApplePayVerificationFile');
