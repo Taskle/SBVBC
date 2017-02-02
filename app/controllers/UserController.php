@@ -131,8 +131,9 @@ class UserController extends BaseController {
 		$tournament_id = Input::get('tournament_id');
 		$division_id = Input::get('division_id');
 		$team_id = Input::get('team_id');
-		$proxy = Input::get('proxy');
+		$proxy = Input::get('proxy'); // registering additional player who is NOT you (the current user)
 		$type = Input::get('type') ? Input::get('type') : 'solo'; // default solo
+
 		// generate original URL with all GET params in case there is a failure
 		// and we need to redirect back to it
 		$originalUrl = URL::action('UserController@getRegister', array(
@@ -161,18 +162,19 @@ class UserController extends BaseController {
 			$team = null;
 		}
 
+		if ($proxy) {
+			$teammateFirstName = Input::get('teammate_first_name');
+			$teammateLastName = Input::get('teammate_last_name');
+			$teammateEmail = Input::get('teammate_email');
+		}
+
 		// if logged in, this is a new team or an individual registration;
 		// if additional, this is someone paying "8th player fee" for their current team
 		if (Auth::check()) {
 
 			$email = Auth::user()->email;
 
-			if ($proxy) {
-				$teammateFirstName = Input::get('first_name');
-				$teammateLastName = Input::get('last_name');
-				$teammateEmail = Input::get('email');
-			}
-			else {
+			if (!$proxy) {
 				$teammateFirstName = Auth::user()->first_name;
 				$teammateLastName = Auth::user()->last_name;
 				$teammateEmail = Auth::user()->email;
@@ -183,7 +185,10 @@ class UserController extends BaseController {
 			// fetch email from form provided
 			$email = Input::get('email') ? Input::get('email') :
 					Input::get('stripeEmail');
-			$teammateEmail = $email;
+
+			if (!$proxy) {
+				$teammateEmail = $email;
+			}
 
 			// check if email already exists - if so, show prompt
 			// to log in first
@@ -196,8 +201,10 @@ class UserController extends BaseController {
 							'email' => Input::get('email'),
 							'password' => Input::get('password')))) {
 
-					$teammateFirstName = Auth::user()->first_name;
-					$teammateLastName = Auth::user()->last_name;
+					if (!$proxy) {
+						$teammateFirstName = Auth::user()->first_name;
+						$teammateLastName = Auth::user()->last_name;
+					}
 
 				} else {
 					if (Cookie::get('stripeToken')) {
@@ -243,8 +250,10 @@ class UserController extends BaseController {
 
 				$userParams['password'] = Hash::make($password);
 
-				$teammateFirstName = $userParams['first_name'];
-				$teammateLastName = $userParams['last_name'];
+				if (!$proxy) {
+					$teammateFirstName = $userParams['first_name'];
+					$teammateLastName = $userParams['last_name'];
+				}
 			}
 		}
 

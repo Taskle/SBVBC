@@ -50,19 +50,19 @@
 @endif
 
 @if ($type == 'additional')
-	{{ Form::text('first_name', $proxy ? null : $user->first_name, array(
+	{{ Form::text('teammate_first_name', $proxy ? null : $user->first_name, array(
 					'class' => 'form-control',
 					'placeholder' => 'Teammate First name',
 					'required' => true,
 					'autofocus' => true,
 		)) }}
-	{{ Form::text('last_name', $proxy ? null : $user->last_name, array(
+	{{ Form::text('teammate_last_name', $proxy ? null : $user->last_name, array(
 					'class' => 'form-control',
 					'placeholder' => 'Teammate Last name',
 					'required' => true,
 		)) }}
 	@if ($proxy)
-		{{ Form::text('email', null, array(
+		{{ Form::text('teammate_email', null, array(
 					'class' => 'form-control',
 					'placeholder' => 'Teammate Email',
 					'required' => true,
