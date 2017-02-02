@@ -208,7 +208,7 @@ class UserController extends BaseController {
 										->withErrors($errorMessage);
 					} else {
 						$errorMessage = 'You already have an SBVBC account. '
-								. 'Please log in to submit your payment';
+								. 'Please log in to submit your payment.';
 
 						$minutes = 60 * 24; // last for a day
 						return Redirect::to($originalUrl)

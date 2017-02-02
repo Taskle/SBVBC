@@ -69,7 +69,7 @@
                                                     <a href="/register?type=team&tournament={{ $tournament->id }}&division={{ $division->id }}" class="btn btn-primary btn-block">Register Team</a>
                                             @endif
                                             @if ($division->allow_additional_team_member)
-                                                    <a href="/register?type=additional&tournament={{ $tournament->id }}&division={{ $division->id }}" class="btn btn-primary btn-block">Register Additional Player</a>
+                                                    <a href="/register?type=additional&tournament={{ $tournament->id }}&division={{ $division->id }}&proxy=1" class="btn btn-primary btn-block">Register Additional Player</a>
                                             @endif
                                     </div>
                             </div>
