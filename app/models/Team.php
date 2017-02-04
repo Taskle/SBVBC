@@ -32,7 +32,8 @@ class Team extends Eloquent {
 	 *
 	 * @return boolean
 	 */
-	public function registerUserByProxy($tournament, $division, $firstName, $lastName, $email, $password) {
+	public function registerUserByProxy($tournament, $division, $firstName,
+			$lastName, $email, $password, $forceLogoutAfterCompletion) {
 
 		$team = $this;
 
@@ -51,16 +52,20 @@ class Team extends Eloquent {
 
 				$existingTeam = $user->getTeam($tournament->id);
 
+				if ($forceLogoutAfterCompletion) {
+					Auth::logout();
+				}
+
 				// if registered as individual they may not be on a team
 				if ($existingTeam) {
 					return Redirect::to('/')->withErrors($user->getFullName() .
-									' is already playing in this tournament on team "' .
-									$existingTeam->name . '"');
+						' is already playing in this tournament on team "' .
+						$existingTeam->name . '"');
 				}
 				else {
 					return Redirect::to('/')->withErrors($user->getFullName() .
-							" is already registered for this tournament. " .
-							"Please email contact@sbvbc.org to change this person's team.");
+						" is already registered for this tournament. " .
+						"Please email contact@sbvbc.org to change this person's team.");
 				}
 			}
 
@@ -118,6 +123,10 @@ class Team extends Eloquent {
 			$message->from('contact@sbvbc.org', 'SBVBC');
 			$message->to($email, $user->getFullName())->subject($subject);
 		});
+
+		if ($forceLogoutAfterCompletion) {
+			Auth::logout();
+		}
 
 		Session::flash('success', 'You have added ' .
 				$user->full_name . ' to your team! We have sent this person a confirmation email.');

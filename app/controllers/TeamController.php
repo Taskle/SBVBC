@@ -70,7 +70,7 @@ class TeamController extends BaseController {
 		} else {
 
 			$team->registerUserByProxy($tournament, $division, $first_name, $last_name, $email,
-					$this->getRandomPassword());
+					$this->getRandomPassword(), false);
 		}
 
 		// go back to home on success

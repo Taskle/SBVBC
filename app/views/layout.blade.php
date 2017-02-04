@@ -51,7 +51,9 @@
 			</div>
 		</div>
 	@show
-	@section('jumbotron')
+	@if(!Session::has('success') && !Session::has('status') && !Session::has('error') && !$errors->has())
+		@section('jumbotron')
+	@endif
 	@show
 	<div class="main container">
 		@if(Session::has('success'))

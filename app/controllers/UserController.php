@@ -133,6 +133,13 @@ class UserController extends BaseController {
 		$team_id = Input::get('team_id');
 		$proxy = Input::get('proxy'); // registering additional player who is NOT you (the current user)
 		$type = Input::get('type') ? Input::get('type') : 'solo'; // default solo
+		$firstName = Input::get('first_name');
+		$lastName = Input::get('last_name');
+		// fetch email from stripe form if provided there instead
+		$email = Input::get('email') ? Input::get('email') : Input::get('stripeEmail');
+		$teammateFirstName = Input::get('teammate_first_name');
+		$teammateLastName = Input::get('teammate_last_name');
+		$teammateEmail = Input::get('teammate_email');
 
 		// generate original URL with all GET params in case there is a failure
 		// and we need to redirect back to it
@@ -141,7 +148,13 @@ class UserController extends BaseController {
 			'tournament' => $tournament_id,
 			'division' => $division_id,
 			'team' => $team_id,
-			'proxy' => ($proxy == 1)
+			'proxy' => ($proxy == 1),
+			'first_name' => $firstName,
+			'last_name' => $lastName,
+			'email' => $email,
+			'teammate_first_name' => $teammateFirstName,
+			'teammate_last_name' => $teammateLastName,
+			'teammate_email_name' => $teammateEmail,
 		));
 
 		if ($tournament_id) {
@@ -162,11 +175,25 @@ class UserController extends BaseController {
 			$team = null;
 		}
 
-		if ($proxy) {
-			$teammateFirstName = Input::get('teammate_first_name');
-			$teammateLastName = Input::get('teammate_last_name');
-			$teammateEmail = Input::get('teammate_email');
+		// if email and teammate email are the same,
+		// this isn't a proxy so disable that flag
+		if ($proxy && $email == $teammateEmail) {
+			$proxy = false;
 		}
+
+		if ($proxy) {
+
+			// set first name and email for user themselves
+			// in case this isn't provided above
+			if (!$firstName) {
+				$firstName = Input::get('teammate_first_name');
+			}
+			if (!$lastName) {
+				$lastName = Input::get('teammate_last_name');
+			}
+		}
+
+		$forceLogoutAfterCompletion = false;
 
 		// if logged in, this is a new team or an individual registration;
 		// if additional, this is someone paying "8th player fee" for their current team
@@ -182,60 +209,54 @@ class UserController extends BaseController {
 
 		} else {
 
-			// fetch email from form provided
-			$email = Input::get('email') ? Input::get('email') :
-					Input::get('stripeEmail');
+			$password = Input::get('password');
 
 			if (!$proxy) {
 				$teammateEmail = $email;
 			}
 
-			// check if email already exists - if so, show prompt
-			// to log in first
+			// check if email already exists - if so, accept
+			// payment on behalf of the email inputted w/o pwd (we
+			// can trust the user as there is no benefit to someone
+			// putting in the wrong email) but DO NOT log
+			// them in (for security)
 			$rules = array('email' => 'unique:users,email');
 			$validator = Validator::make(array('email' => $email), $rules);
 			if ($validator->fails()) {
 
-				// try logging in with password
-				if (Auth::attempt(array(
-							'email' => Input::get('email'),
-							'password' => Input::get('password')))) {
+				// try logging in with password; if that doesn't work,
+				// log in without just to accept payment and associate
+				// team info, but then log them out immediately after
+				// for security
+				if (!Auth::attempt(array(
+						'email' => $email,
+						'password' => $password))) {
 
-					if (!$proxy) {
-						$teammateFirstName = Auth::user()->first_name;
-						$teammateLastName = Auth::user()->last_name;
-					}
+					$user = User::where('email', $email) -> first();
 
-				} else {
-					if (Cookie::get('stripeToken')) {
-						$errorMessage = 'Invalid email or password';
+					// log in without password but force logout
+					// upon completion for security
+					Auth::login($user);
+					$forceLogoutAfterCompletion = true;
+				}
 
-						return Redirect::to($originalUrl)
-										->withInput()
-										->withErrors($errorMessage);
-					} else {
-						$errorMessage = 'You already have an SBVBC account. '
-								. 'Please log in to submit your payment.';
-
-						$minutes = 60 * 24; // last for a day
-						return Redirect::to($originalUrl)
-										->withInput()
-										->withCookie(Cookie::make('email', $email, $minutes))
-										->withCookie(Cookie::make('stripeToken', Input::get('stripeToken'), $minutes))
-										->withErrors($errorMessage);
-					}
+				if (!$proxy) {
+					$teammateFirstName = Auth::user()->first_name;
+					$teammateLastName = Auth::user()->last_name;
 				}
 			}
 
+			// if this is a new user
 			if (!Auth::check()) {
 
 				// set random password if none provided
-				$password = Input::get('password') ? Input::get('password') :
-						$password = $this->getRandomPassword();
+				if (!$password) {
+					$password = $this->getRandomPassword();
+				}
 
 				$userParams = [
-					'first_name' => Input::get('first_name'),
-					'last_name' => Input::get('last_name'),
+					'first_name' => $firstName,
+					'last_name' => $lastName,
 					'email' => $email,
 					'password' => $password
 				];
@@ -251,8 +272,8 @@ class UserController extends BaseController {
 				$userParams['password'] = Hash::make($password);
 
 				if (!$proxy) {
-					$teammateFirstName = $userParams['first_name'];
-					$teammateLastName = $userParams['last_name'];
+					$teammateFirstName = $firstName;
+					$teammateLastName = $lastName;
 				}
 			}
 		}
@@ -304,19 +325,20 @@ class UserController extends BaseController {
 			// if customer doesn't exist or wasn't retrieved, create a new one now
 			if (!isset($customer) || !$customer) {
 				$customer = Stripe_Customer::create(array(
-							"card" => $stripeToken,
-							"email" => $email,
-							"description" => $teammateFirstName . ' ' . $teammateLastName
+					"card" => $stripeToken,
+					"email" => $email,
+					"description" => $teammateFirstName . ' ' . $teammateLastName
 				));
 			}
 
 			// Charge the Customer instead of the card
 			$charge = Stripe_Charge::create(array(
-						"amount" => $amountInCents,
-						"currency" => "usd",
-						"customer" => $customer->id,
-						"description" => $description
+				"amount" => $amountInCents,
+				"currency" => "usd",
+				"customer" => $customer->id,
+				"description" => $description
 			));
+
 		} catch (Stripe_Error $e) {
 
 			$e_json = $e->getJsonBody();
@@ -328,6 +350,10 @@ class UserController extends BaseController {
 
 			// remove cookie since token is now used
 			$cookie = Cookie::forget('stripeToken');
+
+			if ($forceLogoutAfterCompletion) {
+				Auth::logout();
+			}
 
 			return Redirect::to($originalUrl)
 							->withInput()
@@ -341,6 +367,7 @@ class UserController extends BaseController {
 		if (Auth::check()) {
 			$isNewUser = false;
 			$user = Auth::user();
+
 		} else {
 			$isNewUser = true;
 			$user = User::create($userParams);
@@ -350,12 +377,44 @@ class UserController extends BaseController {
 			]);
 		}
 
-		// save user's stripe info
-		$user->stripe_id = $customer->id;
+		// save user's stripe info if legit login or
+		// no stripe id set before
+		if ($user->stripe_id == null ||
+			!$forceLogoutAfterCompletion) {
+			$user->stripe_id = $customer->id;
+		}
 		$user->save();
 
-		// associate with division
-		$user->divisions()->save($division);
+		// if this is you
+		if (!$proxy) {
+
+			// ensure not already playing in this tournament
+			if ($user->isRegisteredForTournament($tournament)) {
+
+				$existingTeam = $user->getTeam($tournament->id);
+
+				if ($forceLogoutAfterCompletion) {
+					Auth::logout();
+				}
+
+				// if registered as individual they may not be on a team
+				if ($existingTeam) {
+					return Redirect::to('/')->withErrors(
+						'You are already playing in this tournament on team "' .
+						$existingTeam->name . '"; please email contact@sbvbc.org to make any changes.');
+				}
+				else {
+					return Redirect::to('/')->withErrors(
+						"You are already registered for this tournament. " .
+						"Please email contact@sbvbc.org to change your team or make other changes.");
+				}
+			}
+			else {
+
+				// associate user with division if not proxy
+				$user->divisions()->save($division);
+			}
+		}
 
 		// if this is a group, create new team accordingly
 		if ($type == 'team') {
@@ -375,7 +434,7 @@ class UserController extends BaseController {
 
 			if ($proxy) {
 				$team->registerUserByProxy($tournament, $division, $teammateFirstName, $teammateLastName,
-						$teammateEmail, $this->getRandomPassword());
+						$teammateEmail, $this->getRandomPassword(), $forceLogoutAfterCompletion);
 			}
 			else {
 				// associate team to user
@@ -431,6 +490,10 @@ class UserController extends BaseController {
 			$output .= ' (' . $division->name . ')';
 		}
 		$output .= '!';
+
+		if ($forceLogoutAfterCompletion) {
+			Auth::logout();
+		}
 
 		Session::flash('success', $output);
 		return Redirect::to('/')->withCookie($cookie);
