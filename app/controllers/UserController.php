@@ -293,6 +293,9 @@ class UserController extends BaseController {
 		if (isset($teammateFirstName) && isset($teammateLastName)) {
 			$description .= ' - ' . $teammateFirstName . ' ' . $teammateLastName;
 		}
+		if (isset($team) && isset($team->name)) {
+			$description .= ' - ' . $team->name;
+		}
 
 		// get price in cents for sending to stripe
 		$amountInDollars = 0;
