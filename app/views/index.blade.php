@@ -73,7 +73,7 @@
 							@elseif ($division->allow_solo_registration)
 								<span class="emphasis">${{ $division->formatted_solo_price }}</span> per person
 							@elseif ($division->allow_additional_team_member)
-								<span class="emphasis">${{ $division->formatted_solo_price }}</span> per additional player on an existing team
+								<span class="emphasis">${{ $division->formatted_additional_team_member_price }}</span> per additional player on an existing team
 							@endif
 						</div>
 						@if ($division->allow_solo_registration)
